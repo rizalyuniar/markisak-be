@@ -23,5 +23,19 @@
   "devDependencies": {
     "eslint": "^8.34.0",
     "nodemon": "^2.0.20"
-  }
+  },
+  "name": "markisak-be",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ikkair/markisak-be.git"
+  },
+  "author": "kelompok-1",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ikkair/markisak-be/issues"
+  },
+  "homepage": "https://github.com/ikkair/markisak-be#readme",
+  "description": ""
 }
