@@ -7,9 +7,10 @@ const adminRouter = require("./admin");
 const recipeRouter = require("./recipe");
 const userRouter = require("./user");
 
-router.use("/admin", adminRouter);
-router.use("/recipe", recipeRouter);
-router.use("/user", userRouter);
+// Use route
+router.use("/v1/admin", adminRouter);
+router.use("/v1/recipe", recipeRouter);
+router.use("/v1/user", userRouter);
 
 // Export router
 module.exports = router;

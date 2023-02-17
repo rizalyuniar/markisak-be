@@ -64,8 +64,14 @@ function selectAllSaved(queryId) {
     );
 }
 
+// Function to select from email
 function selectUserEmail(email) {
     return pool.query(`SELECT * FROM users WHERE email='${email}'`);
+}
+
+// Function to select recipes using id_user
+function selectUserRecipes(queryId) {
+    return pool.query(`SELECT * FROM recipes WHERE id_user='${queryId}'`);
 }
 
 module.exports = {
@@ -78,4 +84,5 @@ module.exports = {
     selectAllLikes,
     selectAllSaved,
     selectUserEmail,
+    selectUserRecipes,
 };

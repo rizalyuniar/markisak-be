@@ -79,8 +79,11 @@ const getDetailUser = async (req, res) => {
         const result = await userModel.selectUser(queryId);
         const likes = await userModel.selectAllLikes(queryId);
         const saved = await userModel.selectAllSaved(queryId);
+        const recipes = await userModel.selectUserRecipes(queryId);
+
         result.rows[0].likes = likes.rows;
         result.rows[0].saved = saved.rows;
+        result.rows[0].recipes = recipes.rows;
 
         // Conditional if database return no item
         if (result.rowCount > 0) {
