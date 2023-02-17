@@ -3,8 +3,8 @@ const express = require("express");
 const router = express.Router();
 
 // Import route
-// const adminRouter = require("./admin");
-// const recipeRouter = require("./recipe");
+const adminRouter = require("./admin");
+const recipeRouter = require("./recipe");
 const userRouter = require("./user");
 
 router.use("/admin", adminRouter);
