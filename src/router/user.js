@@ -6,16 +6,28 @@ const router = express.Router();
 const userController = require("../controller/user.js");
 const upload = require("../middleware/upload.js");
 
+// Import auth
+const authMiddleware = require("../middleware/auth");
+
 // Route link to controller
 router.get("/", userController.getAllUsers);
 router.get("/:id", userController.getDetailUser);
 router.post("/register", upload.single("photo"), userController.registerUser);
-router.put("/:id", upload.single("photo"), userController.updateUser);
-router.delete("/:id", userController.deleteUser);
-// router.get("/", userController.getAllUsers);
-// router.post('/login', customerController.loginCustomer);
-// router.put('/:id', authMiddleware.authToken, authMiddleware.authoCustomer, customerController.updateCustomer);
-// router.delete('/:id', authMiddleware.authToken, authMiddleware.authoCustomer, customerController.deleteCustomer);
+router.post("/refresh-token", userController.refreshToken);
+router.put(
+    "/:id",
+    authMiddleware.protect,
+    authMiddleware.isIdValid,
+    upload.single("photo"),
+    userController.updateUser
+);
+router.delete(
+    "/:id",
+    authMiddleware.protect,
+    authMiddleware.isIdValid,
+    userController.deleteUser
+);
+router.post("/login", userController.loginUser);
 
 // Export router to index.js at router folder
 module.exports = router;

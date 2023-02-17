@@ -1,6 +1,9 @@
 // Import models
 const userModel = require("../model/user");
 
+// Import jwt
+const jwt = require("jsonwebtoken");
+
 // Import hash
 const bcrypt = require("bcryptjs");
 
@@ -9,6 +12,9 @@ const { v4: uuidv4 } = require("uuid");
 
 // Import Helper for Template Response
 const commonHelper = require("../helper/common");
+
+// Import Helper for authentication
+const authHelper = require("../helper/auth");
 
 // Function to get all or search from databas
 const getAllUsers = async (req, res) => {
@@ -71,6 +77,11 @@ const getDetailUser = async (req, res) => {
     try {
         // Calling select from model and then display
         const result = await userModel.selectUser(queryId);
+        const likes = await userModel.selectAllLikes(queryId);
+        const saved = await userModel.selectAllSaved(queryId);
+        result.rows[0].likes = likes.rows;
+        result.rows[0].saved = saved.rows;
+
         // Conditional if database return no item
         if (result.rowCount > 0) {
             commonHelper.response(
@@ -135,8 +146,23 @@ const updateUser = async (req, res) => {
         // Calling select method from model
         const result = await userModel.selectUser(paramId);
         if (result.rowCount > 0) {
-            if (req.body.password == "") {
-                req.body.password = result.rows[0].password;
+            if (typeof req.body.name == "undefined" || req.body.name == "") {
+                req.body.name = result.rows[0].name;
+            }
+            if (typeof req.body.email == "undefined" || req.body.email == "") {
+                req.body.email = result.rows[0].email;
+            }
+            if (
+                typeof req.body.phone_number == "undefined" ||
+                req.body.phone_number == ""
+            ) {
+                req.body.phone_number = result.rows[0].phone_number;
+            }
+            if (
+                typeof req.body.password == "undefined" ||
+                req.body.password == ""
+            ) {
+                req.body.queryPwd = result.rows[0].password;
             } else {
                 // Creating hash password
                 const salt = bcrypt.genSaltSync(10);
@@ -202,10 +228,65 @@ const deleteUser = async (req, res) => {
         });
 };
 
+const loginUser = async (req, res) => {
+    try {
+        const data = req.body;
+
+        const result = await userModel.selectUserEmail(data.email);
+        const user = result.rows[0];
+
+        if (!user) return res.json({ Message: "Email is invalid" });
+        const isValidPassword = bcrypt.compareSync(
+            data.password,
+            user.password
+        );
+        delete user.password;
+        console.log(isValidPassword);
+        if (!isValidPassword)
+            return res.json({ Message: "Password is invalid" });
+
+        const payload = {
+            email: user.email,
+            id: user.id,
+        };
+
+        const token = authHelper.generateToken(payload);
+        user.token = token;
+        user.refreshToken = authHelper.generateRefreshToken(payload);
+
+        res.cookie("access_token", token, {
+            httpOnly: true,
+            maxAge: 24 * 60 * 60 * 1000,
+        });
+        commonHelper.response(res, user, 201, "Login is successful");
+    } catch (error) {
+        console.log(error);
+        res.send(error);
+    }
+};
+
+const refreshToken = (req, res) => {
+    const decoded = jwt.verify(
+        req.body.refreshToken,
+        process.env.SECRET_KEY_JWT
+    );
+    let payload = {
+        email: decoded.email,
+        id: decoded.id,
+    };
+    const result = {
+        token: authHelper.generateToken(payload),
+        refreshToken: authHelper.generateRefreshToken(payload),
+    };
+    commonHelper.response(res, result, 200, "Token refreshed");
+};
+
 module.exports = {
     getAllUsers,
     getDetailUser,
     registerUser,
     deleteUser,
     updateUser,
+    loginUser,
+    refreshToken,
 };

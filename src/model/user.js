@@ -50,6 +50,24 @@ function deleteUser(queryId) {
     return pool.query(`DELETE FROM users WHERE id='${queryId}'`);
 }
 
+// Funciton to select all liked by id
+function selectAllLikes(queryId) {
+    return pool.query(
+        `SELECT recipes.* FROM liked_recipes INNER JOIN recipes ON liked_recipes.id_recipe = recipes.id WHERE liked_recipes.id_user = '${queryId}'`
+    );
+}
+
+// Funciton to select all saved by id
+function selectAllSaved(queryId) {
+    return pool.query(
+        `SELECT recipes.* FROM saved_recipes INNER JOIN recipes ON saved_recipes.id_recipe = recipes.id WHERE saved_recipes.id_user = '${queryId}'`
+    );
+}
+
+function selectUserEmail(email) {
+    return pool.query(`SELECT * FROM users WHERE email='${email}'`);
+}
+
 module.exports = {
     selectAllUser,
     countUser,
@@ -57,4 +75,7 @@ module.exports = {
     insertUser,
     deleteUser,
     updateUser,
+    selectAllLikes,
+    selectAllSaved,
+    selectUserEmail,
 };
