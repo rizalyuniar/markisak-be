@@ -1,6 +1,7 @@
 const { v4: uuidv4 } = require('uuid');
 
 const modelRecipe = require('../model/recipe');
+const modelComment = require('../model/comment');
 const modelVideo = require('../model/video');
 const commonHelper = require('../helper/common');
 
@@ -8,9 +9,9 @@ const getAllRecipes = async (req, res) => {
     try {
         //Search and pagination query
         const searchParam = req.query.search || '';
-        const sortBy = req.query.sortBy || 'created_at';
+        const sortBy = req.query.sortBy || 'updated_at';
         const sort = req.query.sort || 'desc';
-        const limit = Number(req.query.limit) || 8;
+        const limit = Number(req.query.limit) || 6;
         const page = Number(req.query.page) || 1;
         const offset = (page - 1) * limit;
 
@@ -38,13 +39,13 @@ const getDetailRecipe = async (req, res) => {
 
         const result = await modelRecipe.selectRecipe(id);
 
-        //Recipe videos
+        //Get recipe videos
         const resultVideos = await modelVideo.selectRecipeVideos(id);
         const arrayVideos = resultVideos.rows;
         result.rows[0].videos = arrayVideos;
 
-        //Recipe comments
-        const resultComments = await modelRecipe.selectRecipeComments(id);
+        //Get recipe comments
+        const resultComments = await modelComment.selectRecipeComments(id);
         const arrayComments = resultComments.rows;
         result.rows[0].comments = arrayComments;
 
@@ -59,25 +60,23 @@ const createRecipe = async (req, res) => {
     try {
         const data = req.body;
         data.id = uuidv4();
-        data.id_user = '944a76e0-dbb6-406c-986d-d8b181e27ac8'; //Dummy id_user
+        data.id_user = '65618687-a259-41b7-947b-cb7c42302d3f'; //Dummy id_user
         const HOST = process.env.HOST || 'localhost';
         const PORT = process.env.PORT || 443;
-        // data.photo = `http://${HOST}:${PORT}/img/${req.file.filename}`; TODO
-        data.photo = `http://${HOST}:${PORT}/img/${data.photo}`;
-
+        data.photo = `http://${HOST}:${PORT}/img/${req.file.filename}`;
         data.created_at = Date.now();
         data.updated_at = Date.now();
-        await modelRecipe.insertRecipe(data);
+        const result = await modelRecipe.insertRecipe(data);
 
-        data.videos.forEach(async (element, index) => {
+        //Recipe videos
+        const videos = data.videos ? JSON.parse(data.videos) : [];
+        videos.forEach(async (element, index) => {
             element.id = uuidv4();
             element.id_recipe = data.id;
-            element.hello = index;
             await modelVideo.insertVideo(element);
         });
 
-        const getCreated = await modelRecipe.selectRecipe(data.id);
-        commonHelper.response(res, getCreated.rows, 200, "Recipe created");
+        commonHelper.response(res, result.rows, 200, "Recipe created");
     } catch (error) {
         console.log(error);
         res.status(500).send({ statusCode: 500, message: "Something went wrong" });
@@ -96,32 +95,36 @@ const updateRecipe = async (req, res) => {
         data.updated_at = Date.now();
         const HOST = process.env.HOST || 'localhost';
         const PORT = process.env.PORT || 443;
-        // data.photo = `http://${HOST}:${PORT}/img/${req.file.filename}`;
-        data.photo = `http://${HOST}:${PORT}/img/${data.photo}`;
-
-
-
+        data.photo = `http://${HOST}:${PORT}/img/${req.file.filename}`;
 
         const { rows: [count] } = await modelVideo.countRecipeVideo(id);
-        const updateCount = data.videos.length;
-        // const excess = updateCount - count.count;
-        data.videos.forEach(async (element, index) => {
-            await modelVideo.updateVideo(element);
-            // if (excess > 0) {
-            //     await modelRecipe.insertVideo(element);
-            // }
+
+        const videos = data.videos ? JSON.parse(data.videos) : [];
+        const updateCount = videos.length;
+
+        videos.forEach(async (element, index) => {
+            if (index + 1 <= count.count) {
+                await modelVideo.updateVideo(element);
+            } else {
+                element.id = uuidv4();
+                element.id_recipe = data.id;
+                await modelVideo.insertVideo(element, index + 1);
+            }
         });
 
-        const remainder = count.count - updateCount;
-        if (remainder > 0) {
-            for (let i = 1; i <= remainder; i++) {
-                await modelVideo.deleteVideo(id, updateCount + i);
+        //Delete videos if video update count is less than the amount in db
+        const resultVideos = await modelVideo.selectRecipeVideos(id);
+        const arrayVideos = resultVideos.rows;
+        console.log(arrayVideos)
+        arrayVideos.forEach(async (element, index) => {
+            if(index + 1 > updateCount){
+                await modelVideo.deleteVideo(element.id);
             }
-        }
+        })
 
-        await modelRecipe.updateRecipe(data);
-        const getUpdated = await modelRecipe.selectRecipe(id);
-        commonHelper.response(res, getUpdated.rows, 200, "Recipe updated");
+        const result = await modelRecipe.updateRecipe(data);
+
+        commonHelper.response(res, result.rows, 200, "Recipe updated");
     } catch (error) {
         console.log(error);
         res.status(500).send({ statusCode: 500, message: "Something went wrong" });

@@ -13,15 +13,15 @@ const selectComment = (id) => {
 }
 
 const insertComment = (data) => {
-    const { id, id_user, id_recipe, message, created_at } = data;
+    const { id, id_user, id_recipe, message, created_at, updated_at } = data;
     return pool.query(`insert into comments values('${id}', '${id_user}', 
-        '${id_recipe}', '${message}', '${created_at}')`);
+        '${id_recipe}', '${message}', '${created_at}', '${updated_at}')`);
 }
 
 const updateComment = (data) => {
-    const { id, id_user, id_recipe, message, created_at } = data;
-    return pool.query(`update comments set message='${message}'
-        where id='${id}'`);
+    const { id, message, updated_at } = data;
+    return pool.query(`update comments set message='${message}',
+        updated_at=${updated_at} where id='${id}'`);
 }
 
 const deleteComment = (id) => {
