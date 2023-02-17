@@ -1,28 +1,25 @@
 const pool = require('../config/db');
 
-const selectRecipeVideos = (id_recipe) => {
+const selectRecipeLikedRecipes = (id_recipe) => {
     return pool.query(`select id, step, url_video from videos where id_recipe='${id_recipe}' order by step asc`);
 }
 
-const insertVideo = (data, step) => {
-    const { id, id_recipe, url_video } = data;
-    console.log(data);
+const insertLikedRecipe = (data) => {
+    const { id, id_recipe, step, url_video } = data;
     return pool.query(`insert into videos values('${id}', '${id_recipe}', ${step},
         '${url_video}')`);
 }
 
-const updateVideo = (data) => {
+const updateLikedRecipes = (data) => {
     const { id, id_recipe, step, url_video } = data;
-    console.log(data + step);
     return pool.query(`update videos set url_video='${url_video}', step=${step} where id='${id}'`);
 }
 
-const deleteVideo = (id) => {
-    console.log(id);
-    return pool.query(`delete from videos where id='${id}'`);
+const deleteLikedRecipes = (id_recipe, step) => {
+    return pool.query(`delete from videos where id_recipe='${id_recipe}' and step=${step}`);
 }
 
-const countRecipeVideo = (id_recipe) => {
+const countLikedRecipes = (id_recipe) => {
     return pool.query(`select count(*) from videos where id_recipe='${id_recipe}'`);
 }
 
@@ -39,10 +36,5 @@ const findId = (id) => {
 }
 
 module.exports = {
-    selectRecipeVideos,
-    insertVideo,
-    updateVideo,
-    deleteVideo,
-    countRecipeVideo,
-    findId
+    selectAllRecipesOrderByLikeCount,
 }
