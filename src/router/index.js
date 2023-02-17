@@ -8,10 +8,10 @@ const recipeRouter = require("./recipe");
 const userRouter = require("./user");
 const commentRouter = require("./comment");
 
-router.use("/admin", adminRouter);
-router.use("/recipe", recipeRouter);
-router.use("/user", userRouter);
-router.use("/comment", commentRouter);
+// Use route
+router.use("/v1/admin", adminRouter);
+router.use("/v1/recipe", recipeRouter);
+router.use("/v1/user", userRouter);
 
 // Export router
 module.exports = router;
