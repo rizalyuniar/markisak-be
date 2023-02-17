@@ -17,7 +17,7 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(helmet());
 app.use(xss());
-app.use(express.static("src/uploads"));
+app.use(express.static("src/upload"));
 
 // Port choice
 const port = process.env.PORT || 443;
