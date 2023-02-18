@@ -61,7 +61,7 @@ const getAllUsers = async (req, res) => {
                 pagination
             );
         } else {
-            commonHelper.response(res, null, 404, "No data user found");
+            return commonHelper.response(res, null, 404, "No data user found");
         }
     } catch (err) {
         console.log(err);
@@ -86,12 +86,12 @@ const getDetailUser = async (req, res) => {
                 "Get detail user successful"
             );
         } else {
-            commonHelper.response(res, null, 404, "No data user found");
+            return commonHelper.response(res, null, 404, "No data user found");
         }
         const likes = await userModel.selectAllLikes(queryId);
         const saved = await userModel.selectAllSaved(queryId);
         const recipes = await userModel.selectUserRecipes(queryId);
-
+        console.log(result.rowCount);
         result.rows[0].likes = likes.rows;
         result.rows[0].saved = saved.rows;
         result.rows[0].recipes = recipes.rows;
@@ -175,7 +175,7 @@ const updateUser = async (req, res) => {
                 commonHelper.response(res, rslt.rows, 200, "User Updated");
             });
         } else {
-            commonHelper.response(res, null, 404, "No matching id");
+            return commonHelper.response(res, null, 404, "No matching id");
         }
     } catch (err) {
         console.log(err);
@@ -211,7 +211,7 @@ const deleteUser = async (req, res) => {
                     "User deletion success"
                 );
             } else {
-                commonHelper.response(res, null, 404, "Id not found");
+                return commonHelper.response(res, null, 404, "Id not found");
             }
         })
         .catch((err) => {
