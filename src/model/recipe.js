@@ -22,9 +22,8 @@ const insertRecipe = (data) => {
 
 const updateRecipe = (data) => {
     const { id, title, photo, ingredients, updated_at, description } = data;
-    return pool.query(`update recipes set title='${title}', photo='${photo}', 
-        ingredients='${ingredients}', updated_at='${updated_at}', 
-        description='${description}' where id='${id}'`);
+    console.log(data)
+    return pool.query(`update recipes set title='${title}' where id='${id}'`);
 }
 
 const deleteRecipe = (id) => {
@@ -37,7 +36,7 @@ const countData = () => {
 
 const findId = (id) => {
     return new Promise((resolve, reject) =>
-        pool.query(`select id from recipes where id='${id}'`, 
+        pool.query(`select id, id_user from recipes where id='${id}'`, 
         (error, result) => {
             if (!error) {
                 resolve(result)
