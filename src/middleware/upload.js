@@ -33,7 +33,7 @@ const upload = multer({
             return cb(
                 commonHelper.response(
                     res,
-                    result.rows,
+                    null,
                     415,
                     "File extensions should be jpg, jpeg, png"
                 )
