@@ -2,6 +2,9 @@ const multer = require("multer");
 const path = require("path");
 const createError = require("http-errors");
 
+// Import Helper for Template Response
+const commonHelper = require("../helper/common");
+
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, "src/upload");
@@ -28,7 +31,12 @@ const upload = multer({
         const extFile = path.extname(file.originalname).split(".")[1];
         if (!acceptedTypeFile.includes(extFile.toLowerCase())) {
             return cb(
-                new createError(422, "File extensions should be jpg, jpeg, png")
+                commonHelper.response(
+                    res,
+                    null,
+                    415,
+                    "File extensions should be jpg, jpeg, png"
+                )
             );
         }
         cb(null, true);

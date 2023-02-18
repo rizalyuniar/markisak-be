@@ -61,11 +61,11 @@ const getAllUsers = async (req, res) => {
                 pagination
             );
         } else {
-            commonHelper.response(res, result.rows, 200, "No data user found");
+            commonHelper.response(res, null, 404, "No data user found");
         }
     } catch (err) {
         console.log(err);
-        res.send(err.detail);
+        commonHelper.response(res, null, 500, "Failed to get data users");
     }
 };
 
@@ -94,16 +94,11 @@ const getDetailUser = async (req, res) => {
                 "Get detail user successful"
             );
         } else {
-            commonHelper.response(
-                res,
-                result.rows[0],
-                200,
-                "No data user found"
-            );
+            commonHelper.response(res, null, 404, "No data user found");
         }
     } catch (err) {
         console.log(err);
-        res.send(err.detail);
+        commonHelper.response(res, null, 500, "Failed to get data user");
     }
 };
 
@@ -132,7 +127,7 @@ const registerUser = (req, res) => {
         })
         .catch((err) => {
             console.log(err);
-            res.send(err.detail);
+            commonHelper.response(res, null, 400, "Input invalid");
         });
 };
 
@@ -181,11 +176,11 @@ const updateUser = async (req, res) => {
                 commonHelper.response(res, rslt.rows, 200, "User Updated");
             });
         } else {
-            commonHelper.response(res, result.rows, 200, "No matching id");
+            commonHelper.response(res, null, 404, "No matching id");
         }
     } catch (err) {
         console.log(err);
-        res.send(err.detail);
+        commonHelper.response(res, null, 500, "Failed to update user");
     }
 };
 
@@ -217,17 +212,12 @@ const deleteUser = async (req, res) => {
                     "User deletion success"
                 );
             } else {
-                commonHelper.response(
-                    res,
-                    result.rows,
-                    200,
-                    "User deletion failed"
-                );
+                commonHelper.response(res, null, 404, "Id not found");
             }
         })
         .catch((err) => {
             console.log(err);
-            res.send(err.detail);
+            commonHelper.response(res, null, 500, "Failed to delete user");
         });
 };
 
@@ -238,14 +228,18 @@ const loginUser = async (req, res) => {
         const result = await userModel.selectUserEmail(data.email);
         const user = result.rows[0];
 
-        if (!user) return res.json({ Message: "Email is invalid" });
+        if (!user) {
+            commonHelper.response(res, null, 400, "Email is invalid");
+        }
         const isValidPassword = bcrypt.compareSync(
             data.password,
             user.password
         );
         delete user.password;
-        if (!isValidPassword)
-            return res.json({ Message: "Password is invalid" });
+        console.log(isValidPassword);
+        if (!isValidPassword) {
+            commonHelper.response(res, null, 400, "Password is invalid");
+        }
 
         const payload = {
             email: user.email,
@@ -260,10 +254,10 @@ const loginUser = async (req, res) => {
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000,
         });
-        commonHelper.response(res, user, 201, "Login is successful");
-    } catch (error) {
-        console.log(error);
-        res.send(error);
+        commonHelper.response(res, user, 200, "Login is successful");
+    } catch (err) {
+        console.log(err);
+        commonHelper.response(res, null, 500, "Login failed");
     }
 };
 
