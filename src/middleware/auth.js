@@ -21,7 +21,7 @@ const protect = (req, res, next) => {
         if (error && error.name === "JsonWebTokenError") {
             commonHelper.response(res, null, 401, "Token invalid");
         } else if (error && error.name === "TokenExpiredError") {
-            commonHelper.response(res, null, 401, "Token expired");
+            commonHelper.response(res, null, 403, "Token expired");
         } else {
             commonHelper.response(res, null, 401, "Token not active");
         }
