@@ -14,12 +14,7 @@ const commonHelper = require("./src/helper/common");
 
 // Use middleware
 app.use(express.json());
-app.use(
-    cors({
-        origin: "https://fe-tes.vercel.app",
-        credential: true,
-    })
-);
+app.use(cors());
 app.use(morgan("dev"));
 app.use(helmet());
 app.use(xss());
