@@ -15,6 +15,7 @@ const commonHelper = require("../helper/common");
 
 // Import Helper for authentication
 const authHelper = require("../helper/auth");
+const { sendMail } = require("../config/mail");
 
 // Function to get all or search from databas
 const getAllUsers = async (req, res) => {
@@ -101,32 +102,55 @@ const getDetailUser = async (req, res) => {
 };
 
 // Function to create
-const registerUser = (req, res) => {
-    // Creating random id
-    req.body.queryId = uuidv4();
-    // Adding photo filename to req body
-    const HOST = process.env.RAILWAY_STATIC_URL;
-    console.log(req.body);
-    // Adding default photo
-    req.body.queryFilename = "photo.jpg";
+const registerUser = async (req, res) => {
+    try {
+        const result = await userModel.selectUserEmail(req.body.email);
+        if (result.rowCount > 0) {
+            return commonHelper.response(res, null, 400, "Email already used");
+        }
+    } catch (err) {
+        console.log(err);
+        return commonHelper.response(res, null, 500, err.detail);
+    }
     // Creating hash password
     const salt = bcrypt.genSaltSync(10);
-    req.body.queryPwd = bcrypt.hashSync(req.body.password, salt);
+    queryPwd = bcrypt.hashSync(req.body.password, salt);
+    // Creating random id
+    queryId = uuidv4();
+    // Creating payload for jwt
+    const payload = {
+        name: req.body.name,
+        email: req.body.email,
+        phone_number: req.body.phone_number,
+        queryFilename: "photo.jpg",
+        queryPwd: queryPwd,
+        queryId: queryId,
+    };
+    const token = authHelper.generateToken(payload);
+    sendMail(token, req.body.email);
+    commonHelper.response(res, null, 200, "Check your email");
 
-    //Convert email to lowercase
-    req.body.email = req.body.email.toLowerCase();
-
-    // Calling insert from model
-    userModel
-        .insertUser(req.body)
-        .then((result) => {
-            // Display the result
-            return commonHelper.response(res, result.rows, 201, "User created");
-        })
-        .catch((err) => {
-            console.log(err);
-            return commonHelper.response(res, null, 400, err.detail);
-        });
+    // // Creating random id
+    // req.body.queryId = uuidv4();
+    // // Adding photo filename to req body
+    // const HOST = process.env.HOST;
+    // const PORT = process.env.PORT;
+    // // Set default photo
+    // req.body.queryFilename = "photo.jpg";
+    // // Creating hash password
+    // const salt = bcrypt.genSaltSync(10);
+    // req.body.queryPwd = bcrypt.hashSync(req.body.password, salt);
+    // // Calling insert from model
+    // userModel
+    //     .insertUser(req.body)
+    //     .then((result) => {
+    //         // Display the result
+    //         return commonHelper.response(res, result.rows, 201, "User created");
+    //     })
+    //     .catch((err) => {
+    //         console.log(err);
+    //         return commonHelper.response(res, null, 400, err.detail);
+    //     });
 };
 
 //   Function to update
@@ -278,10 +302,18 @@ const loginUser = async (req, res) => {
 };
 
 const refreshToken = (req, res) => {
-    const decoded = jwt.verify(
-        req.body.refreshToken,
-        process.env.SECRET_KEY_JWT
-    );
+    let decoded;
+    try {
+        decoded = jwt.verify(req.body.refreshToken, process.env.SECRET_KEY_JWT);
+    } catch (error) {
+        if (error && error.name === "JsonWebTokenError") {
+            return commonHelper.response(res, null, 401, "Token invalid");
+        } else if (error && error.name === "TokenExpiredError") {
+            return commonHelper.response(res, null, 401, "Token expired");
+        } else {
+            return commonHelper.response(res, null, 401, "Token not active");
+        }
+    }
     let payload = {
         email: decoded.email,
         id: decoded.id,
@@ -293,6 +325,47 @@ const refreshToken = (req, res) => {
     return commonHelper.response(res, [result], 200, "Token refreshed");
 };
 
+const verifUser = async (req, res) => {
+    const token = req.params.id;
+    let decoded;
+    try {
+        decoded = jwt.verify(token, process.env.SECRET_KEY_JWT);
+    } catch (error) {
+        if (error && error.name === "JsonWebTokenError") {
+            return commonHelper.response(res, null, 401, "Token invalid");
+        } else if (error && error.name === "TokenExpiredError") {
+            return commonHelper.response(res, null, 403, "Token expired");
+        } else {
+            return commonHelper.response(res, null, 401, "Token not active");
+        }
+    }
+
+    try {
+        const result = await userModel.selectUserEmail(decoded.email);
+        if (result.rowCount > 0) {
+            return commonHelper.response(
+                res,
+                null,
+                400,
+                "Email already verified"
+            );
+        }
+    } catch (err) {
+        console.log(err);
+        return commonHelper.response(res, null, 500, err.detail);
+    }
+    userModel
+        .insertUser(decoded)
+        .then((result) => {
+            // Display the result
+            return commonHelper.response(res, result.rows, 201, "User created");
+        })
+        .catch((err) => {
+            console.log(err);
+            return commonHelper.response(res, null, 400, err.detail);
+        });
+};
+
 module.exports = {
     getAllUsers,
     getDetailUser,
@@ -301,4 +374,5 @@ module.exports = {
     updateUser,
     loginUser,
     refreshToken,
+    verifUser,
 };
