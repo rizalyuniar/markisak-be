@@ -77,24 +77,6 @@ const getDetailUser = async (req, res) => {
     try {
         // Calling select from model and then display
         const result = await userModel.selectUser(queryId);
-
-        //Check if user exists
-        const { rowCount } = await userModel.findId(queryId);
-        if (!rowCount) return commonHelper.response(res, null, 404, "User not found");
-
-        console.log(queryId)
-        const likes = await userModel.selectAllLikes(queryId);
-        const saved = await userModel.selectAllSaved(queryId);
-        const recipes = await userModel.selectUserRecipes(queryId);
-
-        result.rows[0].likes = likes.rows;
-        result.rows[0].saved = saved.rows;
-        result.rows[0].recipes = recipes.rows;
-
-        console.log(result)
-        //Delete user password
-        delete result.rows[0].password;
-
         // Conditional if database return no item
         if (result.rowCount > 0) {
             commonHelper.response(
@@ -106,6 +88,13 @@ const getDetailUser = async (req, res) => {
         } else {
             commonHelper.response(res, null, 404, "No data user found");
         }
+        const likes = await userModel.selectAllLikes(queryId);
+        const saved = await userModel.selectAllSaved(queryId);
+        const recipes = await userModel.selectUserRecipes(queryId);
+
+        result.rows[0].likes = likes.rows;
+        result.rows[0].saved = saved.rows;
+        result.rows[0].recipes = recipes.rows;
     } catch (err) {
         console.log(err);
         commonHelper.response(res, null, 500, "Failed to get data user");
@@ -264,7 +253,7 @@ const loginUser = async (req, res) => {
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000,
         });
-        commonHelper.response(res, user, 200, "Login is successful");
+        commonHelper.response(res, [user], 200, "Login is successful");
     } catch (err) {
         console.log(err);
         commonHelper.response(res, null, 500, "Login failed");
@@ -284,7 +273,7 @@ const refreshToken = (req, res) => {
         token: authHelper.generateToken(payload),
         refreshToken: authHelper.generateRefreshToken(payload),
     };
-    commonHelper.response(res, result, 200, "Token refreshed");
+    commonHelper.response(res, [result], 200, "Token refreshed");
 };
 
 module.exports = {
