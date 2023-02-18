@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const commonHelper = require('../helper/common');
+const commonHelper = require("../helper/common");
 
 const protect = (req, res, next) => {
     try {
@@ -10,7 +10,12 @@ const protect = (req, res, next) => {
             req.payload = decoded;
             next();
         } else {
-            commonHelper.response(res, null, 401, "Unauthorized, server needed a token");
+            commonHelper.response(
+                res,
+                null,
+                401,
+                "Unauthorized, server needed a token"
+            );
         }
     } catch (error) {
         if (error && error.name === "JsonWebTokenError") {
@@ -30,7 +35,12 @@ const isIdValid = (req, res, next) => {
         if (payload.id == queryId) {
             next();
         } else {
-            commonHelper.response(res, null, 403, "Your ID did not match parameter");
+            commonHelper.response(
+                res,
+                null,
+                403,
+                "Your ID did not match parameter"
+            );
         }
     } else {
         commonHelper.response(res, null, 403, "ID not found");
