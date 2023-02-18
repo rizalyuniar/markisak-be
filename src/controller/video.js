@@ -1,43 +1,31 @@
 const { v4: uuidv4 } = require('uuid');
 
 const commonHelper = require('../helper/common');
-const modelComment = require('../model/comment');
+const modelVideo = require('../model/video');
 const modelRecipe = require('../model/recipe');
 
-const getRecipeComments = async (req, res) => {
+const getRecipeVideos = async (req, res) => {
     try {
-        //Params and pagination query
-        const sortBy = req.query.sortBy || 'updated_at';
-        const sort = req.query.sort || 'desc';
-        const limit = Number(req.query.limit) || 10;
-        const page = Number(req.query.page) || 1;
-        const offset = (page - 1) * limit;
-
         //Check if recipe exists in db
         const id_recipe = req.params.id_recipe;
         const { rowCount } = await modelRecipe.findId(id_recipe);
         if (!rowCount) return commonHelper.response(res, null, 404, "Recipe not found");
 
-        //Get recipe comments
-        const result = await modelComment.selectRecipeComments(id_recipe, sortBy, sort, limit, offset);
+        //Get recipe videos
+        const result = await modelVideo.selectRecipeVideos(id_recipe);
         
-        //Return not found if there's no recipe comment in database
-        if (!result.rows[0]) return commonHelper.response(res, null, 404, "Recipe comment not found");
-
-        //Pagination info
-        const totalData = Number(result.rowCount);
-        const totalPage = Math.ceil(totalData / limit);
-        const pagination = { currentPage: page, limit, totalData, totalPage };
+        //Return not found if there's no recipe video in database
+        if (!result.rows[0]) return commonHelper.response(res, null, 404, "Recipe video not found");
 
         //Response
-        commonHelper.response(res, result.rows, 200, "Get recipe comments successful", pagination);
+        commonHelper.response(res, result.rows, 200, "Get recipe videos successful");
     } catch (error) {
         console.log(error);
-        commonHelper.response(res, null, 500, "Failed getting recipe comments");
+        commonHelper.response(res, null, 500, "Failed getting recipe videos");
     }
 }
 
-const getDetailComment = async (req, res) => {
+const getDetailVideo = async (req, res) => {
     try {
         //Check if recipe exists in db
         const id_recipe = req.params.id_recipe;
@@ -45,22 +33,22 @@ const getDetailComment = async (req, res) => {
         if (!findIdRecipe.rowCount) return commonHelper.response(res, null, 404, "Recipe not found");
         
         //Check if comment exists in database
-        const id_comment = req.params.id_comment;
-        const findIdComment = await modelComment.findId(id_comment);
-        if (!findIdComment.rowCount) return commonHelper.response(res, null, 404, "Recipe comment not found");
+        const id_video = req.params.id_video;
+        const findIdVideo = await modelVideo.findId(id_video);
+        if (!findIdVideo.rowCount) return commonHelper.response(res, null, 404, "Detail video not found");
 
-        //Get detail comment
-        const result = await modelComment.selectComment(id_recipe, id_comment);
+        //Get detail video
+        const result = await modelVideo.selectDetailVideo(id);
 
         //Response
-        commonHelper.response(res, result.rows, 200, "Get detail comment successful");
+        commonHelper.response(res, result.rows, 200, "Get detail video successful");
     } catch (error) {
         console.log(error);
-        commonHelper.response(res, null, 500, "Failed getting detail comment");
+        commonHelper.response(res, null, 500, "Failed getting detail video");
     }
 }
 
-const createComment = async (req, res) => {
+const createVideo = async (req, res) => {
     try {
         //Check if recipe exists in db
         const id_recipe = req.params.id_recipe;
@@ -70,12 +58,9 @@ const createComment = async (req, res) => {
         //Get request body
         const data = req.body;
 
-        //Comment metadata
+        //Video metadata
         data.id = uuidv4();
-        data.id_user = req.payload.id;
-        data.id_recipe = req.params.id_recipe;
-        data.created_at = Date.now();
-        data.updated_at = Date.now();
+        data.id_recipe = id_recipe;
 
         //Insert comment
         const results = await modelComment.insertComment(data);
@@ -88,7 +73,7 @@ const createComment = async (req, res) => {
     }
 }
 
-const updateComment = async (req, res) => {
+const updateVideo = async (req, res) => {
     try {
         //Check if recipe exists in db
         const id_recipe = req.params.id_recipe;
@@ -125,7 +110,7 @@ const updateComment = async (req, res) => {
     }
 }
 
-const deleteComment = async (req, res) => {
+const deleteVideo = async (req, res) => {
     try {
         //Check if recipe exists in db
         const id_recipe = req.params.id_recipe;
@@ -155,9 +140,10 @@ const deleteComment = async (req, res) => {
 }
 
 module.exports = {
-    getRecipeComments,
-    getDetailComment,
-    createComment,
-    updateComment,
-    deleteComment
+    getRecipeVideos,
+    getDetailVideo,
+    createVideo,
+    updateVideo,
+    deleteRecipeVideos,
+    deleteVideo
 }

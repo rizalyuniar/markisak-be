@@ -1,7 +1,11 @@
 const pool = require('../config/db');
 
 const selectRecipeVideos = (id_recipe) => {
-    return pool.query(`select id, step, url_video from videos where id_recipe='${id_recipe}' order by step asc`);
+    return pool.query(`select * from videos where id_recipe='${id_recipe}' order by step asc`);
+}
+
+const selectDetailVideo = (id) => {
+    return pool.query(`select * from videos where id='${id}' order by step asc`);
 }
 
 const insertVideo = (data) => {
@@ -41,6 +45,7 @@ const findId = (id) => {
 
 module.exports = {
     selectRecipeVideos,
+    selectDetailVideo,
     insertVideo,
     updateVideo,
     deleteRecipeVideos,

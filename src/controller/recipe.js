@@ -15,8 +15,10 @@ const getAllRecipes = async (req, res) => {
         const page = Number(req.query.page) || 1;
         const offset = (page - 1) * limit;
 
-        //Check if recipe exists in database
+        //Get recipe in database
         const result = await modelRecipe.selectAllRecipes(searchParam, sortBy, sort, limit, offset);
+        
+        //Return not found if there's no recipe in database
         if (!result.rows[0]) return commonHelper.response(res, null, 404, "Recipe not found");
 
         //Pagination info
@@ -80,14 +82,6 @@ const createRecipe = async (req, res) => {
         //Insert recipe
         const result = await modelRecipe.insertRecipe(data);
 
-        //Recipe videos
-        const videos = data.videos ? JSON.parse(data.videos) : [];
-        videos.forEach(async (element) => {
-            element.id = uuidv4();
-            element.id_recipe = data.id;
-            await modelVideo.insertVideo(element);
-        });
-
         //Response
         commonHelper.response(res, result.rows, 201, "Recipe created");
     } catch (error) {
@@ -122,17 +116,6 @@ const updateRecipe = async (req, res) => {
         const HOST = process.env.HOST || 'localhost';
         const PORT = process.env.PORT || 443;
         data.photo = `http://${HOST}:${PORT}/img/${req.file.filename}`;
-
-        //Delete recipe videos
-        await modelVideo.deleteRecipeVideos(id);
-
-        //Add recipe videos
-        const videos = data.videos ? JSON.parse(data.videos) : [];
-        videos.forEach(async (element) => {
-            element.id = uuidv4();
-            element.id_recipe = data.id;
-            await modelVideo.insertVideo(element);
-        });
         
         //Update recipe
         const result = await modelRecipe.updateRecipe(data);
