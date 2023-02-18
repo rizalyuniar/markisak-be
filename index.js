@@ -16,7 +16,7 @@ const commonHelper = require("./src/helper/common");
 app.use(express.json());
 app.use(
     cors({
-        origin: "https://fe-hi3cxl2jb-mhmdiamd.vercel.app/",
+        origin: "https://fe-tes.vercel.app",
         credential: true,
     })
 );
