@@ -53,7 +53,7 @@ const getAllUsers = async (req, res) => {
         };
         // Conditional if database return no item
         if (result.rowCount > 0) {
-            commonHelper.response(
+            return commonHelper.response(
                 res,
                 result.rows,
                 200,
@@ -78,14 +78,7 @@ const getDetailUser = async (req, res) => {
         // Calling select from model and then display
         const result = await userModel.selectUser(queryId);
         // Conditional if database return no item
-        if (result.rowCount > 0) {
-            commonHelper.response(
-                res,
-                result.rows,
-                200,
-                "Get detail user successful"
-            );
-        } else {
+        if (result.rowCount < 1) {
             return commonHelper.response(res, null, 404, "No data user found");
         }
         const likes = await userModel.selectAllLikes(queryId);
@@ -95,9 +88,15 @@ const getDetailUser = async (req, res) => {
         result.rows[0].likes = likes.rows;
         result.rows[0].saved = saved.rows;
         result.rows[0].recipes = recipes.rows;
+        return commonHelper.response(
+            res,
+            result.rows,
+            200,
+            "Get detail user successful"
+        );
     } catch (err) {
         console.log(err);
-        commonHelper.response(res, null, 500, "Failed to get data user");
+        return commonHelper.response(res, null, 500, "Failed to get data user");
     }
 };
 
@@ -108,25 +107,21 @@ const registerUser = (req, res) => {
     // Adding photo filename to req body
     const HOST = process.env.HOST;
     const PORT = process.env.PORT;
-    // Default photo if there is no photo
-    try {
-        req.body.queryFilename = `http://${HOST}:${PORT}/${req.file.filename}`;
-    } catch (err) {
-        req.body.queryFilename = "photo.jpg";
-    }
+    console.log(req.body);
     // Creating hash password
     const salt = bcrypt.genSaltSync(10);
     req.body.queryPwd = bcrypt.hashSync(req.body.password, salt);
+
     // Calling insert from model
     userModel
         .insertUser(req.body)
         .then((result) => {
             // Display the result
-            commonHelper.response(res, result.rows, 201, "User created");
+            return commonHelper.response(res, result.rows, 201, "User created");
         })
         .catch((err) => {
             console.log(err);
-            commonHelper.response(res, null, 400, "Input invalid");
+            return commonHelper.response(res, null, 400, err.detail);
         });
 };
 
@@ -172,14 +167,19 @@ const updateUser = async (req, res) => {
                 req.body.queryFilename = result.rows[0].photo;
             }
             userModel.updateUser(req.body).then((rslt) => {
-                commonHelper.response(res, rslt.rows, 200, "User Updated");
+                return commonHelper.response(
+                    res,
+                    rslt.rows,
+                    200,
+                    "User Updated"
+                );
             });
         } else {
             return commonHelper.response(res, null, 404, "No matching id");
         }
     } catch (err) {
         console.log(err);
-        commonHelper.response(res, null, 500, "Failed to update user");
+        return commonHelper.response(res, null, 500, "Failed to update user");
     }
 };
 
@@ -204,7 +204,7 @@ const deleteUser = async (req, res) => {
         .then((result) => {
             // Display the result
             if (result.rowCount > 0) {
-                commonHelper.response(
+                return commonHelper.response(
                     res,
                     result.rows,
                     200,
@@ -216,7 +216,12 @@ const deleteUser = async (req, res) => {
         })
         .catch((err) => {
             console.log(err);
-            commonHelper.response(res, null, 500, "Failed to delete user");
+            return commonHelper.response(
+                res,
+                null,
+                500,
+                "Failed to delete user"
+            );
         });
 };
 
@@ -228,7 +233,7 @@ const loginUser = async (req, res) => {
         const user = result.rows[0];
 
         if (!user) {
-            commonHelper.response(res, null, 400, "Email is invalid");
+            return commonHelper.response(res, null, 400, "Email is invalid");
         }
         const isValidPassword = bcrypt.compareSync(
             data.password,
@@ -237,7 +242,7 @@ const loginUser = async (req, res) => {
         delete user.password;
         console.log(isValidPassword);
         if (!isValidPassword) {
-            commonHelper.response(res, null, 400, "Password is invalid");
+            return commonHelper.response(res, null, 400, "Password is invalid");
         }
 
         const payload = {
@@ -253,10 +258,10 @@ const loginUser = async (req, res) => {
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000,
         });
-        commonHelper.response(res, [user], 200, "Login is successful");
+        return commonHelper.response(res, [user], 200, "Login is successful");
     } catch (err) {
         console.log(err);
-        commonHelper.response(res, null, 500, "Login failed");
+        return commonHelper.response(res, null, 500, "Login failed");
     }
 };
 
@@ -273,7 +278,7 @@ const refreshToken = (req, res) => {
         token: authHelper.generateToken(payload),
         refreshToken: authHelper.generateRefreshToken(payload),
     };
-    commonHelper.response(res, [result], 200, "Token refreshed");
+    return commonHelper.response(res, [result], 200, "Token refreshed");
 };
 
 module.exports = {
