@@ -72,8 +72,7 @@ const createRecipe = async (req, res) => {
         data.updated_at = Date.now();
 
         //Recipe photo
-        console.log(req)
-        if(!req.file.filename) return commonHelper.response(res, null, 400, "Please input photo");
+        if(req.file == undefined) return commonHelper.response(res, null, 400, "Please input photo");
         const HOST = process.env.HOST || 'localhost';
         const PORT = process.env.PORT || 443;
         data.photo = `http://${HOST}:${PORT}/img/${req.file.filename}`;
@@ -106,20 +105,20 @@ const updateRecipe = async (req, res) => {
             return commonHelper.response(res, null, 404, "Recipe not found");
 
         //Check if recipe is created by user logged in
-        if(findIdResults.rows[0].id != req.payload.id) 
+        if(findIdResults.rows[0].id_user != req.payload.id) 
             return commonHelper.response(res, null, 403, 
                 "Updating recipe created by other user is not allowed");
-
+        
         //Get request body
         const data = req.body;
-
+        
         //Recipe metadata
         data.id = req.params.id;
         data.id_user = req.payload.id;
         data.updated_at = Date.now();
 
         //Recipe photo
-        if(!req.file) return commonHelper.response(res, null, 400, "Please input photo");
+        if(req.file == undefined) return commonHelper.response(res, null, 400, "Please input photo");
         const HOST = process.env.HOST || 'localhost';
         const PORT = process.env.PORT || 443;
         data.photo = `http://${HOST}:${PORT}/img/${req.file.filename}`;
@@ -134,30 +133,7 @@ const updateRecipe = async (req, res) => {
             element.id_recipe = data.id;
             await modelVideo.insertVideo(element);
         });
-
-        // //Update recipe videos
-        // const { rows: [count] } = await modelVideo.countRecipeVideo(id);
-        // const videos = data.videos ? JSON.parse(data.videos) : [];
-        // const updateCount = videos.length;
-        // videos.forEach(async (element, index) => {
-        //     if (index + 1 <= count.count) {
-        //         await modelVideo.updateVideo(element);
-        //     } else {
-        //         element.id = uuidv4();
-        //         element.id_recipe = data.id;
-        //         await modelVideo.insertVideo(element, index + 1);
-        //     }
-        // });
-
-        // //Delete some videos if videos received from client is less than the amount in db
-        // const resultVideos = await modelVideo.selectRecipeVideos(id);
-        // const arrayVideos = resultVideos.rows;
-        // arrayVideos.forEach(async (element, index) => {
-        //     if(index + 1 > updateCount){
-        //         await modelVideo.deleteVideo(element.id);
-        //     }
-        // })
-
+        
         //Update recipe
         const result = await modelRecipe.updateRecipe(data);
 
@@ -178,7 +154,7 @@ const deleteRecipe = async (req, res) => {
             return commonHelper.response(res, null, 404, "Recipe not found");
 
         //Check if recipe is created by user logged in
-        if(findIdResults.rows[0].id != req.payload.id) 
+        if(findIdResults.rows[0].id_user != req.payload.id) 
             return commonHelper.response(res, null, 403, 
                 "Deleting recipe created by other user is not allowed");
 

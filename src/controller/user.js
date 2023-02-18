@@ -77,6 +77,12 @@ const getDetailUser = async (req, res) => {
     try {
         // Calling select from model and then display
         const result = await userModel.selectUser(queryId);
+
+        //Check if user exists
+        const { rowCount } = await userModel.findId(queryId);
+        if (!rowCount) return commonHelper.response(res, null, 404, "User not found");
+
+        console.log(queryId)
         const likes = await userModel.selectAllLikes(queryId);
         const saved = await userModel.selectAllSaved(queryId);
         const recipes = await userModel.selectUserRecipes(queryId);
@@ -85,11 +91,15 @@ const getDetailUser = async (req, res) => {
         result.rows[0].saved = saved.rows;
         result.rows[0].recipes = recipes.rows;
 
+        console.log(result)
+        //Delete user password
+        delete result.rows[0].password;
+
         // Conditional if database return no item
         if (result.rowCount > 0) {
             commonHelper.response(
                 res,
-                result.rows[0],
+                result.rows,
                 200,
                 "Get detail user successful"
             );

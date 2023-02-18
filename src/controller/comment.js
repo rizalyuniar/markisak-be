@@ -13,6 +13,7 @@ const getRecipeComments = async (req, res) => {
 
         //Get recipe comments
         const result = await modelComment.selectRecipeComments(id_recipe);
+        if (!result.rows[0]) return commonHelper.response(res, null, 404, "Recipe comment not found");
 
         //Response
         commonHelper.response(res, result.rows, 200, "Get recipe comments successful");
@@ -86,7 +87,7 @@ const updateComment = async (req, res) => {
         if (!findIdComment.rowCount) return commonHelper.response(res, null, 404, "Comment not found");
 
         //Check if comment is created by user logged in
-        if(findIdComment.rows[0].id != req.payload.id) 
+        if(findIdComment.rows[0].id_user != req.payload.id) 
         return commonHelper.response(res, null, 403, 
             "Updating comment created by other user is not allowed");
         
@@ -123,12 +124,13 @@ const deleteComment = async (req, res) => {
         if (!findIdComment.rowCount) return commonHelper.response(res, null, 404, "Comment not found");
 
         //Check if comment is created by user logged in
-        if(findIdComment.rows[0].id != req.payload.id) 
+        if(findIdComment.rows[0].id_user != req.payload.id) 
         return commonHelper.response(res, null, 403, 
             "Deleting comment created by other user is not allowed");
 
         //Delete comment
-        const result = await modelComment.deleteComment(id_comment);
+        const id_user = req.payload.id;
+        const result = await modelComment.deleteComment(id_comment, id_recipe, );
         
         //Response
         commonHelper.response(res, result.rows, 200, "Comment deleted");
