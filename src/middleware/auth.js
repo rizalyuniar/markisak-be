@@ -1,25 +1,24 @@
 const jwt = require("jsonwebtoken");
-const createError = require("http-errors");
+const commonHelper = require('../helper/common');
 
 const protect = (req, res, next) => {
     try {
         let token;
-        console.log(req.headers);
         if (req.headers.authorization) {
             token = req.headers.authorization.split(" ")[1];
             let decoded = jwt.verify(token, process.env.SECRET_KEY_JWT);
             req.payload = decoded;
             next();
         } else {
-            res.json({ message: "server need token" });
+            commonHelper.response(res, null, 401, "Unauthorized, server needed a token");
         }
     } catch (error) {
         if (error && error.name === "JsonWebTokenError") {
-            next(new createError(400, "Token invalid"));
+            commonHelper.response(res, null, 401, "Token invalid");
         } else if (error && error.name === "TokenExpiredError") {
-            next(new createError(400, "Token expired"));
+            commonHelper.response(res, null, 401, "Token expired");
         } else {
-            next(new createError(400, "Token not active"));
+            commonHelper.response(res, null, 401, "Token not active");
         }
     }
 };
@@ -31,10 +30,10 @@ const isIdValid = (req, res, next) => {
         if (payload.id == queryId) {
             next();
         } else {
-            res.status(403).json({ message: "Your id did not match" });
+            commonHelper.response(res, null, 403, "Your ID did not match parameter");
         }
     } else {
-        res.status(403).json({ message: "Id not found" });
+        commonHelper.response(res, null, 403, "ID not found");
     }
 };
 

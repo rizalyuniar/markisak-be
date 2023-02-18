@@ -244,7 +244,6 @@ const loginUser = async (req, res) => {
             user.password
         );
         delete user.password;
-        console.log(isValidPassword);
         if (!isValidPassword)
             return res.json({ Message: "Password is invalid" });
 

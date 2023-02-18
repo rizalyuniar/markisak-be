@@ -6,25 +6,27 @@ const selectRecipeVideos = (id_recipe) => {
 
 const insertVideo = (data, step) => {
     const { id, id_recipe, url_video } = data;
-    console.log(data);
     return pool.query(`insert into videos values('${id}', '${id_recipe}', ${step},
         '${url_video}')`);
 }
 
 const updateVideo = (data) => {
-    const { id, id_recipe, step, url_video } = data;
-    console.log(data + step);
+    const { id, step, url_video } = data;
     return pool.query(`update videos set url_video='${url_video}', step=${step} where id='${id}'`);
 }
 
-const deleteVideo = (id) => {
-    console.log(id);
-    return pool.query(`delete from videos where id='${id}'`);
+const deleteRecipeVideos = (id) => {
+    return pool.query(`delete from videos where id_recipe='${id_recipe}'`);
 }
 
-const countRecipeVideo = (id_recipe) => {
-    return pool.query(`select count(*) from videos where id_recipe='${id_recipe}'`);
-}
+// const countRecipeVideo = (id_recipe) => {
+//     return pool.query(`select count(*) from videos where id_recipe='${id_recipe}'`);
+// }
+
+// const deleteVideo = (id) => {
+//     console.log(id);
+//     return pool.query(`delete from videos where id='${id}'`);
+// }
 
 const findId = (id) => {
     return new Promise((resolve, reject) =>
@@ -42,7 +44,6 @@ module.exports = {
     selectRecipeVideos,
     insertVideo,
     updateVideo,
-    deleteVideo,
-    countRecipeVideo,
+    deleteRecipeVideos,
     findId
 }

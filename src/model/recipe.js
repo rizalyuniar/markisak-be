@@ -13,16 +13,18 @@ const selectRecipe = (id) => {
 }
 
 const insertRecipe = (data) => {
-    const { id, id_user, title, photo, ingredients, created_at, updated_at, description } = data;
-    return pool.query(`insert into recipes values('${id}', '${id_user}', '${title}',
-        '${photo}', '${ingredients}', '${created_at}', '${updated_at}', '${description}')`);
+    const { id, id_user, title, photo, ingredients, created_at, updated_at, 
+        description } = data;
+    return pool.query(`insert into recipes values('${id}', '${id_user}', 
+        '${title}', '${photo}', '${ingredients}', '${created_at}', 
+        '${updated_at}', '${description}')`);
 }
 
 const updateRecipe = (data) => {
-    const { id, id_user, title, photo, ingredients, created_at, updated_at, description } = data;
+    const { id, title, photo, ingredients, updated_at, description } = data;
     return pool.query(`update recipes set title='${title}', photo='${photo}', 
-        ingredients='${ingredients}', updated_at='${updated_at}', description='${description}'
-        where id='${id}'`);
+        ingredients='${ingredients}', updated_at='${updated_at}', 
+        description='${description}' where id='${id}'`);
 }
 
 const deleteRecipe = (id) => {
@@ -35,7 +37,8 @@ const countData = () => {
 
 const findId = (id) => {
     return new Promise((resolve, reject) =>
-        pool.query(`select id from recipes where id='${id}'`, (error, result) => {
+        pool.query(`select id from recipes where id='${id}'`, 
+        (error, result) => {
             if (!error) {
                 resolve(result)
             } else {

@@ -6,107 +6,135 @@ const modelRecipe = require('../model/recipe');
 
 const getRecipeComments = async (req, res) => {
     try {
-        const id_recipe = req.params.id;
+        //Check if recipe exists in db
+        const id_recipe = req.params.id_recipe;
         const { rowCount } = await modelRecipe.findId(id_recipe);
-        if (!rowCount) return res.json({ message: "Recipe not found" });
+        if (!rowCount) return commonHelper.response(res, null, 404, "Recipe not found");
 
+        //Get recipe comments
         const result = await modelComment.selectRecipeComments(id_recipe);
 
-        commonHelper.response(res, result.rows, 200, "Get comments in recipe successful");
+        //Response
+        commonHelper.response(res, result.rows, 200, "Get recipe comments successful");
     } catch (error) {
         console.log(error);
-        res.status(500).send({ statusCode: 500, message: "Something went wrong" });
+        commonHelper.response(res, null, 500, "Failed getting recipe comments");
     }
 }
 
 const getDetailComment = async (req, res) => {
     try {
-        const id = req.params.id;
-        const { rowCount } = await modelComment.findId(id);
-        if (!rowCount) return res.json({ message: "Comment not found" });
+        //Check if recipe exists in db
+        const id_recipe = req.params.id_recipe;
+        const findIdRecipe = await modelRecipe.findId(id_recipe);
+        if (!findIdRecipe.rowCount) return commonHelper.response(res, null, 404, "Recipe not found");
+        
+        //Check if comment exists in database
+        const id_comment = req.params.id_comment;
+        const findIdComment = await modelComment.findId(id_comment);
+        if (!findIdComment.rowCount) return commonHelper.response(res, null, 404, "Comment not found");
 
-        const result = await modelComment.selectComment(id);
+        //Get detail comment
+        const result = await modelComment.selectComment(id_recipe, id_comment);
 
-        commonHelper.response(res, result.rows, 200, "Get comment successful");
+        //Response
+        commonHelper.response(res, result.rows, 200, "Get detail comment successful");
     } catch (error) {
         console.log(error);
-        res.status(500).send({ statusCode: 500, message: "Something went wrong" });
+        commonHelper.response(res, null, 500, "Failed getting detail comment");
     }
 }
 
 const createComment = async (req, res) => {
     try {
+        //Check if recipe exists in db
+        const id_recipe = req.params.id_recipe;
+        const findIdRecipe = await modelRecipe.findId(id_recipe);
+        if (!findIdRecipe.rowCount) return commonHelper.response(res, null, 404, "Recipe not found");
+
+        //Get request body
         const data = req.body;
+
+        //Comment metadata
         data.id = uuidv4();
-        data.id_user = '944a76e0-dbb6-406c-986d-d8b181e27ac8'; //Dummy id_user
+        data.id_user = req.payload.id;
+        data.id_recipe = req.params.id_recipe;
         data.created_at = Date.now();
         data.updated_at = Date.now();
-        await modelRecipe.insertRecipe(data);
 
-        const getCreated = await modelRecipe.selectRecipe(data.id);
-        commonHelper.response(res, getCreated.rows, 200, "Recipe created");
+        //Insert comment
+        const results = await modelComment.insertComment(data);
+
+        //Response
+        commonHelper.response(res, results.rows, 201, "Comment created");
     } catch (error) {
         console.log(error);
-        res.status(500).send({ statusCode: 500, message: "Something went wrong" });
+        commonHelper.response(res, null, 500, "Failed creating comment");
     }
 }
 
 const updateComment = async (req, res) => {
     try {
-        const id = req.params.id;
-        const { rowCount } = await modelRecipe.findId(id);
-        if (!rowCount) return res.json({ message: "Recipe not found" });
+        //Check if recipe exists in db
+        const id_recipe = req.params.id_recipe;
+        const findIdRecipe = await modelRecipe.findId(id_recipe);
+        if (!findIdRecipe.rowCount) return commonHelper.response(res, null, 404, "Recipe not found");
 
-        const data = req.body;
-        data.id = id;
-        data.id_user = '944a76e0-dbb6-406c-986d-d8b181e27ac8'; //Dummy id_user
-        data.updated_at = Date.now();
-        const HOST = process.env.HOST || 'localhost';
-        const PORT = process.env.PORT || 443;
-        // data.photo = `http://${HOST}:${PORT}/img/${req.file.filename}`;
-        data.photo = `http://${HOST}:${PORT}/img/${data.photo}`;
+        //Check if comment exists in database
+        const id_comment = req.params.id_comment;
+        const findIdComment = await modelComment.findId(id_comment);
+        if (!findIdComment.rowCount) return commonHelper.response(res, null, 404, "Comment not found");
 
-
-
-
-        const { rows: [count] } = await modelVideo.countRecipeVideo(id);
-        const updateCount = data.videos.length;
-        // const excess = updateCount - count.count;
-        data.videos.forEach(async (element, index) => {
-            await modelVideo.updateVideo(element);
-            // if (excess > 0) {
-            //     await modelRecipe.insertVideo(element);
-            // }
-        });
-
-        const remainder = count.count - updateCount;
+        //Check if comment is created by user logged in
+        if(findIdComment.rows[0].id != req.payload.id) 
+        return commonHelper.response(res, null, 403, 
+            "Updating comment created by other user is not allowed");
         
-        if (remainder > 0) {
-            for (let i = 1; i <= remainder; i++) {
-                await modelVideo.deleteVideo(id, updateCount + i);
-            }
-        }
+        //Get request body
+        const data = req.body;
 
-        await modelRecipe.updateRecipe(data);
-        const getUpdated = await modelRecipe.selectRecipe(id);
-        commonHelper.response(res, getUpdated.rows, 200, "Recipe updated");
+        //Comment metadata
+        data.id = id_comment;
+        data.id_user = req.payload.id;
+        data.id_recipe = id_recipe;
+        data.updated_at = Date.now();
+        
+        //Update comment
+        const results = await modelComment.updateComment(data);
+
+        //Response
+        commonHelper.response(res, results.rows, 201, "Comment updated");
     } catch (error) {
         console.log(error);
-        res.status(500).send({ statusCode: 500, message: "Something went wrong" });
+        commonHelper.response(res, null, 500, "Failed updating comment");
     }
 }
 
 const deleteComment = async (req, res) => {
     try {
-        const id = req.params.id;
-        const { rowCount } = await modelRecipe.findId(id);
-        if (!rowCount) return res.json({ message: "Recipe not found" });
+        //Check if recipe exists in db
+        const id_recipe = req.params.id_recipe;
+        const findIdRecipe = await modelRecipe.findId(id_recipe);
+        if (!findIdRecipe.rowCount) return commonHelper.response(res, null, 404, "Recipe not found");
 
-        const result = await modelRecipe.deleteRecipe(id);
-        commonHelper.response(res, result.rows, 200, "Recipe deleted");
+        //Check if comment exists in database
+        const id_comment = req.params.id_comment;
+        const findIdComment = await modelComment.findId(id_comment);
+        if (!findIdComment.rowCount) return commonHelper.response(res, null, 404, "Comment not found");
+
+        //Check if comment is created by user logged in
+        if(findIdComment.rows[0].id != req.payload.id) 
+        return commonHelper.response(res, null, 403, 
+            "Deleting comment created by other user is not allowed");
+
+        //Delete comment
+        const result = await modelComment.deleteComment(id_comment);
+        
+        //Response
+        commonHelper.response(res, result.rows, 200, "Comment deleted");
     } catch (error) {
         console.log(error);
-        res.status(500).send({ statusCode: 500, message: "Something went wrong" });
+        commonHelper.response(res, null, 500, "Failed deleting comment");
     }
 }
 
