@@ -7,7 +7,7 @@ const commonHelper = require('../helper/common');
 
 const getAllRecipes = async (req, res) => {
     try {
-        //Search and pagination query
+        //Search, params, and pagination query
         const searchParam = req.query.search || '';
         const sortBy = req.query.sortBy || 'updated_at';
         const sort = req.query.sort || 'desc';
@@ -15,28 +15,31 @@ const getAllRecipes = async (req, res) => {
         const page = Number(req.query.page) || 1;
         const offset = (page - 1) * limit;
 
+        //Check if recipe exists in database
         const result = await modelRecipe.selectAllRecipes(searchParam, sortBy, sort, limit, offset);
-        if (!result.rows[0]) return res.json({ message: "No recipe found" });
+        if (!result.rows[0]) return commonHelper.response(res, null, 404, "Recipe not found");
 
         //Pagination info
-        const { rows: [count] } = await modelRecipe.countData();
-        const totalData = Number(count.count);
+        const totalData = Number(result.rowCount);
         const totalPage = Math.ceil(totalData / limit);
         const pagination = { currentPage: page, limit, totalData, totalPage };
 
+        //Response
         commonHelper.response(res, result.rows, 200, "Get all recipes successful", pagination);
     } catch (error) {
         console.log(error);
-        res.status(500).send({ statusCode: 500, message: "Something went wrong" });
+        commonHelper.response(res, null, 500, "Failed getting recipes");
     }
 }
 
 const getDetailRecipe = async (req, res) => {
     try {
+        //Check if recipe exists in database
         const id = req.params.id;
         const { rowCount } = await modelRecipe.findId(id);
-        if (!rowCount) return res.json({ message: "Recipe not found" });
+        if (!rowCount) return commonHelper.response(res, null, 404, "Recipe not found");
 
+        //Get recipe by id
         const result = await modelRecipe.selectRecipe(id);
 
         //Get recipe videos
@@ -49,99 +52,144 @@ const getDetailRecipe = async (req, res) => {
         const arrayComments = resultComments.rows;
         result.rows[0].comments = arrayComments;
 
-        commonHelper.response(res, result.rows, 200, "Get recipe successful");
+        //Response
+        commonHelper.response(res, result.rows, 200, "Get detail recipe successful");
     } catch (error) {
         console.log(error);
-        res.status(500).send({ statusCode: 500, message: "Something went wrong" });
+        commonHelper.response(res, null, 500, "Failed getting detail recipe");
     }
 }
 
 const createRecipe = async (req, res) => {
     try {
+        //Get request body
         const data = req.body;
+
+        //Recipe metadata
         data.id = uuidv4();
-        data.id_user = '65618687-a259-41b7-947b-cb7c42302d3f'; //Dummy id_user
+        data.id_user = req.payload.id;
+        data.created_at = Date.now();
+        data.updated_at = Date.now();
+
+        //Recipe photo
+        console.log(req)
+        if(!req.file.filename) return commonHelper.response(res, null, 400, "Please input photo");
         const HOST = process.env.HOST || 'localhost';
         const PORT = process.env.PORT || 443;
         data.photo = `http://${HOST}:${PORT}/img/${req.file.filename}`;
-        data.created_at = Date.now();
-        data.updated_at = Date.now();
+
+        //Insert recipe
         const result = await modelRecipe.insertRecipe(data);
 
         //Recipe videos
         const videos = data.videos ? JSON.parse(data.videos) : [];
-        videos.forEach(async (element, index) => {
+        videos.forEach(async (element) => {
             element.id = uuidv4();
             element.id_recipe = data.id;
             await modelVideo.insertVideo(element);
         });
 
-        commonHelper.response(res, result.rows, 200, "Recipe created");
+        //Response
+        commonHelper.response(res, result.rows, 201, "Recipe created");
     } catch (error) {
         console.log(error);
-        res.status(500).send({ statusCode: 500, message: "Something went wrong" });
+        commonHelper.response(res, null, 500, "Failed creating recipe");
     }
 }
 
 const updateRecipe = async (req, res) => {
     try {
+        //Check if recipe exists in database
         const id = req.params.id;
-        const { rowCount } = await modelRecipe.findId(id);
-        if (!rowCount) return res.json({ message: "Recipe not found" });
+        const findIdResults = await modelRecipe.findId(id);
+        if (!findIdResults.rowCount) 
+            return commonHelper.response(res, null, 404, "Recipe not found");
 
+        //Check if recipe is created by user logged in
+        if(findIdResults.rows[0].id != req.payload.id) 
+            return commonHelper.response(res, null, 403, 
+                "Updating recipe created by other user is not allowed");
+
+        //Get request body
         const data = req.body;
-        data.id = id;
-        data.id_user = '944a76e0-dbb6-406c-986d-d8b181e27ac8'; //Dummy id_user
+
+        //Recipe metadata
+        data.id = req.params.id;
+        data.id_user = req.payload.id;
         data.updated_at = Date.now();
+
+        //Recipe photo
+        if(!req.file) return commonHelper.response(res, null, 400, "Please input photo");
         const HOST = process.env.HOST || 'localhost';
         const PORT = process.env.PORT || 443;
         data.photo = `http://${HOST}:${PORT}/img/${req.file.filename}`;
 
-        const { rows: [count] } = await modelVideo.countRecipeVideo(id);
+        //Delete recipe videos
+        await modelVideo.deleteRecipeVideos(id);
 
+        //Add recipe videos
         const videos = data.videos ? JSON.parse(data.videos) : [];
-        const updateCount = videos.length;
-
-        videos.forEach(async (element, index) => {
-            if (index + 1 <= count.count) {
-                await modelVideo.updateVideo(element);
-            } else {
-                element.id = uuidv4();
-                element.id_recipe = data.id;
-                await modelVideo.insertVideo(element, index + 1);
-            }
+        videos.forEach(async (element) => {
+            element.id = uuidv4();
+            element.id_recipe = data.id;
+            await modelVideo.insertVideo(element);
         });
 
-        //Delete videos if video update count is less than the amount in db
-        const resultVideos = await modelVideo.selectRecipeVideos(id);
-        const arrayVideos = resultVideos.rows;
-        console.log(arrayVideos)
-        arrayVideos.forEach(async (element, index) => {
-            if(index + 1 > updateCount){
-                await modelVideo.deleteVideo(element.id);
-            }
-        })
+        // //Update recipe videos
+        // const { rows: [count] } = await modelVideo.countRecipeVideo(id);
+        // const videos = data.videos ? JSON.parse(data.videos) : [];
+        // const updateCount = videos.length;
+        // videos.forEach(async (element, index) => {
+        //     if (index + 1 <= count.count) {
+        //         await modelVideo.updateVideo(element);
+        //     } else {
+        //         element.id = uuidv4();
+        //         element.id_recipe = data.id;
+        //         await modelVideo.insertVideo(element, index + 1);
+        //     }
+        // });
 
+        // //Delete some videos if videos received from client is less than the amount in db
+        // const resultVideos = await modelVideo.selectRecipeVideos(id);
+        // const arrayVideos = resultVideos.rows;
+        // arrayVideos.forEach(async (element, index) => {
+        //     if(index + 1 > updateCount){
+        //         await modelVideo.deleteVideo(element.id);
+        //     }
+        // })
+
+        //Update recipe
         const result = await modelRecipe.updateRecipe(data);
 
-        commonHelper.response(res, result.rows, 200, "Recipe updated");
+        //Response
+        commonHelper.response(res, result.rows, 201, "Recipe updated");
     } catch (error) {
         console.log(error);
-        res.status(500).send({ statusCode: 500, message: "Something went wrong" });
+        commonHelper.response(res, null, 500, "Failed updating recipe");
     }
 }
 
 const deleteRecipe = async (req, res) => {
     try {
+        //Check if recipe exists in database
         const id = req.params.id;
-        const { rowCount } = await modelRecipe.findId(id);
-        if (!rowCount) return res.json({ message: "Recipe not found" });
+        const findIdResults = await modelRecipe.findId(id);
+        if (!findIdResults.rowCount) 
+            return commonHelper.response(res, null, 404, "Recipe not found");
 
+        //Check if recipe is created by user logged in
+        if(findIdResults.rows[0].id != req.payload.id) 
+            return commonHelper.response(res, null, 403, 
+                "Deleting recipe created by other user is not allowed");
+
+        //Delete recipe
         const result = await modelRecipe.deleteRecipe(id);
+        
+        //Response
         commonHelper.response(res, result.rows, 200, "Recipe deleted");
     } catch (error) {
         console.log(error);
-        res.status(500).send({ statusCode: 500, message: "Something went wrong" });
+        commonHelper.response(res, null, 500, "Failed deleting recipe");
     }
 }
 

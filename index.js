@@ -10,6 +10,7 @@ const createError = require("http-errors"); // Import http error
 const morgan = require("morgan"); // Import morgan
 const xss = require("xss-clean"); // Import xss
 const app = express(); // Import express
+const commonHelper = require('./src/helper/common');
 
 // Use middleware
 app.use(express.json());
@@ -24,6 +25,9 @@ const port = process.env.PORT || 443;
 
 // use Main Router
 app.use("/", mainRouter);
+app.all("*", (req, res, next) => {
+    next(commonHelper.response(res, null, 404, "URL not Found"));
+});
 
 // Listening port awaiting requests
 app.listen(port, () => {

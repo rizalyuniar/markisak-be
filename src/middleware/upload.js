@@ -22,6 +22,7 @@ const upload = multer({
         fileSize: 2 * 1000 * 1000, //2 MB
     },
     fileFilter: (req, file, cb) => {
+
         const acceptedTypeFile = ["jpg", "png", "jpeg"];
 
         const extFile = path.extname(file.originalname).split(".")[1];

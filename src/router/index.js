@@ -6,7 +6,6 @@ const router = express.Router();
 const adminRouter = require("./admin");
 const recipeRouter = require("./recipe");
 const userRouter = require("./user");
-const commentRouter = require("./comment");
 
 // Use route
 router.use("/v1/admin", adminRouter);
