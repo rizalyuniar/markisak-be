@@ -12,7 +12,7 @@ const authMiddleware = require("../middleware/auth");
 // Route link to controller
 router.get("/", userController.getAllUsers);
 router.get("/:id", userController.getDetailUser);
-router.post("/register", upload.single("photo"), userController.registerUser);
+router.post("/register", userController.registerUser);
 router.post("/refresh-token", userController.refreshToken);
 router.put(
     "/:id",
