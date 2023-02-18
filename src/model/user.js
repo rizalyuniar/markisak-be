@@ -74,6 +74,19 @@ function selectUserRecipes(queryId) {
     return pool.query(`SELECT * FROM recipes WHERE id_user='${queryId}'`);
 }
 
+const findId = (id) => {
+    return new Promise((resolve, reject) =>
+        pool.query(`select id from users where id='${id}'`, 
+        (error, result) => {
+            if (!error) {
+                resolve(result)
+            } else {
+                reject(error)
+            }
+        })
+    )
+}
+
 module.exports = {
     selectAllUser,
     countUser,
@@ -85,4 +98,5 @@ module.exports = {
     selectAllSaved,
     selectUserEmail,
     selectUserRecipes,
+    findId
 };
