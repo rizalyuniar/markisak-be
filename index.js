@@ -10,11 +10,16 @@ const createError = require("http-errors"); // Import http error
 const morgan = require("morgan"); // Import morgan
 const xss = require("xss-clean"); // Import xss
 const app = express(); // Import express
-const commonHelper = require('./src/helper/common');
+const commonHelper = require("./src/helper/common");
 
 // Use middleware
 app.use(express.json());
-app.use(cors());
+app.use(
+    cors({
+        origin: "http://c530-158-140-182-84.ngrok.io/",
+        credential: true,
+    })
+);
 app.use(morgan("dev"));
 app.use(helmet());
 app.use(xss());
