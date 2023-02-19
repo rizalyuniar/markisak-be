@@ -14,12 +14,13 @@ const selectRecipe = (id) => {
             (error, result) => (!error) ? resolve(result) : reject(error)));
 }
 
+
 const insertRecipe = (data) => {
     const { id, id_user, title, photo, ingredients, created_at, updated_at,
         description } = data;
     return pool.query(`INSERT INTO recipes VALUES('${id}', '${id_user}', 
-        '${title}', '${photo}', '${ingredients}', '${created_at}', 
-        '${updated_at}', '${description}')`);
+        '${title}', '${photo}', '${description}', '${ingredients}', '${created_at}', 
+        '${updated_at}')`);
 }
 
 const updateRecipe = (data) => {
