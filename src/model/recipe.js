@@ -35,7 +35,7 @@ const deleteRecipe = (id) => {
 
 const countData = () => {
     return new Promise((resolve, reject) =>
-        pool.query(`select count(*) from recipes'`,
+        pool.query(`select count(*) from recipes`,
             (error, result) => (!error) ? resolve(result) : reject(error)));
 }
 
