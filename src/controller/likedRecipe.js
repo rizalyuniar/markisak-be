@@ -6,16 +6,31 @@ const modelRecipe = require('../model/recipe');
 
 const getLikedRecipe = async (req, res) => {
     try {
+        //Params and pagination query
+        const sortBy = req.query.sortBy || 'updated_at';
+        const sort = req.query.sort || 'desc';
+        const limit = Number(req.query.limit) || 10;
+        const page = Number(req.query.page) || 1;
+        const offset = (page - 1) * limit;
+
         //Check if recipe exists in db
         const id_recipe = req.params.id_recipe;
         const { rowCount } = await modelRecipe.findId(id_recipe);
         if (!rowCount) return commonHelper.response(res, null, 404, "Recipe not found");
 
-        //Get Liked Recipe
-        const result = await modelLikedRecipe.selectLikedRecipe(id_recipe);
+        //Get Liked Recipe 
+        const result = await modelLikedRecipe.selectLikedRecipe(id_recipe, sortBy, sort, limit, offset);
+
+        //Return not found if there's no liked recipe in database
+        if (!result.rows[0]) return commonHelper.response(res, null, 404, "Liked recipe not found");
+
+        //Pagination info
+        const totalData = Number(result.rowCount);
+        const totalPage = Math.ceil(totalData / limit);
+        const pagination = { currentPage: page, limit, totalData, totalPage };
 
         //Response
-        commonHelper.response(res, result.rows, 200, "Get liked recipe successful");
+        commonHelper.response(res, result.rows, 200, "Get liked recipe successful", pagination);
     } catch (error) {
         console.log(error);
         commonHelper.response(res, null, 500, "Failed getting liked recipe");

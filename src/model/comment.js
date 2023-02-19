@@ -1,43 +1,40 @@
 const pool = require('../config/db');
 
-const selectRecipeComments = (id_recipe) => {
-    return pool.query(`select comments.id, users.name as name, users.photo as photo, comments.message, 
-        comments.created_at, comments.updated_at from comments inner join users on comments.id_user = users.id 
-        where id_recipe='${id_recipe}'`)
+const selectRecipeComments = (id_recipe, sortBy = 'updated_at', sort = 'desc', limit = '100', offset = '0') => {
+    return pool.query(`SELECT comments.id, users.id, users.name AS name, 
+        users.photo AS photo, comments.message, comments.created_at, 
+        comments.updated_at FROM comments INNER JOIN users 
+        ON comments.id_user = users.id WHERE id_recipe='${id_recipe}' 
+        ORDER BY ${sortBy} ${sort} LIMIT ${limit} OFFSET ${offset}`);
 }
 
-const selectComment = (id_recipe, id_comment) => {
-    return pool.query(`select comments.id, users.name as name, users.photo as photo, comments.message, 
-        comments.created_at from comments inner join users on comments.id_user = users.id 
-        where id_recipe='${id_recipe}' and comments.id='${id_comment}'`)
+const selectComment = (id) => {
+    return new Promise((resolve, reject) =>
+        pool.query(`SELECT comments.id, users.name AS name, 
+            users.photo AS photo, comments.message, comments.created_at 
+            FROM comments INNER JOIN users ON comments.id_user = users.id 
+            WHERE comments.id='${id}'`, (error, result) => 
+                !error ? resolve(result) : reject(error)));
 }
 
 const insertComment = (data) => {
     const { id, id_user, id_recipe, message, created_at, updated_at } = data;
-    return pool.query(`insert into comments values('${id}', '${id_user}', 
+    return pool.query(`INSERT INTO comments VALUES('${id}', '${id_user}', 
         '${id_recipe}', '${message}', '${created_at}', '${updated_at}')`);
 }
 
 const updateComment = (data) => {
-    const { id, id_user, id_recipe, message, created_at, updated_at } = data;
-    return pool.query(`update comments set message='${message}',
-        updated_at=${updated_at} where id='${id}' and id_user='${id_user}' and id_recipe='${id_recipe}'`);
+    const { id, message, updated_at } = data;
+    return pool.query(`UPDATE comments SET message='${message}', 
+        updated_at=${updated_at} WHERE id='${id}'`);
 }
 
-const deleteComment = (id, id_recipe, id_user) => {
-    return pool.query(`delete from comments where id='${id}'`);
+const deleteComment = (id) => {
+    return pool.query(`DELETE FROM comments WHERE id='${id}'`);
 }
 
-const findId = (id) => {
-    return new Promise((resolve, reject) =>
-        pool.query(`select id, id_user from comments where id='${id}'`, (error, result) => {
-            if (!error) {
-                resolve(result)
-            } else {
-                reject(error)
-            }
-        })
-    )
+const countData = () => {
+    pool.query(`select count(*) from comments'`);
 }
 
 module.exports = {
@@ -46,5 +43,5 @@ module.exports = {
     insertComment,
     updateComment,
     deleteComment,
-    findId
+    countData
 }

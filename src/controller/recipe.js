@@ -1,13 +1,14 @@
 const { v4: uuidv4 } = require('uuid');
 
-const modelRecipe = require('../model/recipe');
-const modelComment = require('../model/comment');
-const modelVideo = require('../model/video');
-const commonHelper = require('../helper/common');
+const commonHelper = require('../helper/common.js');
+const commentModel = require('../model/comment.js');
+const recipeModel = require('../model/recipe.js');
+const videoModel = require('../model/video.js');
+
 
 const getAllRecipes = async (req, res) => {
     try {
-        //Search, params, and pagination query
+        //Search and pagination query
         const searchParam = req.query.search || '';
         const sortBy = req.query.sortBy || 'updated_at';
         const sort = req.query.sort || 'desc';
@@ -15,17 +16,22 @@ const getAllRecipes = async (req, res) => {
         const page = Number(req.query.page) || 1;
         const offset = (page - 1) * limit;
 
-        //Check if recipe exists in database
-        const result = await modelRecipe.selectAllRecipes(searchParam, sortBy, sort, limit, offset);
-        if (!result.rows[0]) return commonHelper.response(res, null, 404, "Recipe not found");
+        //Get all recipes from database
+        const results = await recipeModel
+            .selectAllRecipes(searchParam, sortBy, sort, limit, offset);
+
+        //Return not found if there's no recipe in database
+        if (!results.rows[0]) return commonHelper
+            .response(res, null, 404, "Recipes not found");
 
         //Pagination info
-        const totalData = Number(result.rowCount);
+        const totalData = Number(results.rowCount);
         const totalPage = Math.ceil(totalData / limit);
         const pagination = { currentPage: page, limit, totalData, totalPage };
 
         //Response
-        commonHelper.response(res, result.rows, 200, "Get all recipes successful", pagination);
+        commonHelper.response(res, results.rows, 200,
+            "Get all recipes successful", pagination);
     } catch (error) {
         console.log(error);
         commonHelper.response(res, null, 500, "Failed getting recipes");
@@ -34,26 +40,29 @@ const getAllRecipes = async (req, res) => {
 
 const getDetailRecipe = async (req, res) => {
     try {
-        //Check if recipe exists in database
+        //Get request recipe id
         const id = req.params.id;
-        const { rowCount } = await modelRecipe.findId(id);
-        if (!rowCount) return commonHelper.response(res, null, 404, "Recipe not found");
 
-        //Get recipe by id
-        const result = await modelRecipe.selectRecipe(id);
+        //Get recipe by id from database
+        const result = await recipeModel.selectRecipe(id);
 
-        //Get recipe videos
-        const resultVideos = await modelVideo.selectRecipeVideos(id);
-        const arrayVideos = resultVideos.rows;
-        result.rows[0].videos = arrayVideos;
+        //Return not found if there's no recipe in database
+        if (!result.rowCount) return commonHelper
+            .response(res, null, 404, "Recipe not found");
 
-        //Get recipe comments
-        const resultComments = await modelComment.selectRecipeComments(id);
-        const arrayComments = resultComments.rows;
-        result.rows[0].comments = arrayComments;
+        //Get recipe videos from database
+        const resultVideos = await videoModel.selectRecipeVideos(id);
+        result.rows[0].videos = resultVideos.rows;
+
+        //Get recipe comments from database
+        const resultComments = await commentModel.selectRecipeComments(id);
+        result.rows[0].comments = resultComments.rows;
 
         //Response
-        commonHelper.response(res, result.rows, 200, "Get detail recipe successful");
+        //Both recipe videos and comments will return empty array
+        //If there's no recipe videos or comments in database
+        commonHelper.response(res, result.rows, 200,
+            "Get detail recipe successful");
     } catch (error) {
         console.log(error);
         commonHelper.response(res, null, 500, "Failed getting detail recipe");
@@ -62,80 +71,59 @@ const getDetailRecipe = async (req, res) => {
 
 const createRecipe = async (req, res) => {
     try {
-        //Get request body
+        //Get request recipe data
         const data = req.body;
 
-        //Recipe metadata
-        data.id = uuidv4();
-        data.id_user = req.payload.id;
-        data.created_at = Date.now();
-        data.updated_at = Date.now();
-
-        //Recipe photo
-        if(req.file == undefined) return commonHelper.response(res, null, 400, "Please input photo");
+        //Get recipe photo
+        if (req.file == undefined) return commonHelper
+            .response(res, null, 400, "Please input photo");
         const HOST = process.env.HOST || 'localhost';
         const PORT = process.env.PORT || 443;
         data.photo = `http://${HOST}:${PORT}/img/${req.file.filename}`;
 
-        //Insert recipe
-        const result = await modelRecipe.insertRecipe(data);
-
-        //Recipe videos
-        const videos = data.videos ? JSON.parse(data.videos) : [];
-        videos.forEach(async (element) => {
-            element.id = uuidv4();
-            element.id_recipe = data.id;
-            await modelVideo.insertVideo(element);
-        });
+        //Insert recipe to database
+        data.id = uuidv4();
+        data.id_user = req.payload.id;
+        data.created_at = Date.now();
+        data.updated_at = Date.now();
+        const result = await recipeModel.insertRecipe(data);
 
         //Response
-        commonHelper.response(res, result.rows, 201, "Recipe created");
+        commonHelper.response(res, result.rows, 201, "Recipe added");
     } catch (error) {
         console.log(error);
-        commonHelper.response(res, null, 500, "Failed creating recipe");
+        commonHelper.response(res, null, 500, "Failed adding recipe");
     }
 }
 
 const updateRecipe = async (req, res) => {
     try {
-        //Check if recipe exists in database
+        //Get request recipe id, user id, and recipe data
         const id = req.params.id;
-        const findIdResults = await modelRecipe.findId(id);
-        if (!findIdResults.rowCount) 
+        const id_user = req.payload.id;
+        const data = req.body;
+
+        //Check if recipe exists in database
+        const recipeResult = await recipeModel.selectRecipe(id);
+        if (!recipeResult.rowCount)
             return commonHelper.response(res, null, 404, "Recipe not found");
 
         //Check if recipe is created by user logged in
-        if(findIdResults.rows[0].id_user != req.payload.id) 
-            return commonHelper.response(res, null, 403, 
+        if (recipeResult.rows[0].id_user != id_user)
+            return commonHelper.response(res, null, 403,
                 "Updating recipe created by other user is not allowed");
-        
-        //Get request body
-        const data = req.body;
-        
-        //Recipe metadata
-        data.id = req.params.id;
-        data.id_user = req.payload.id;
-        data.updated_at = Date.now();
 
-        //Recipe photo
-        if(req.file == undefined) return commonHelper.response(res, null, 400, "Please input photo");
+        //Get recipe photo
+        if (req.file == undefined) return commonHelper
+            .response(res, null, 400, "Please input photo");
         const HOST = process.env.HOST || 'localhost';
         const PORT = process.env.PORT || 443;
         data.photo = `http://${HOST}:${PORT}/img/${req.file.filename}`;
 
-        //Delete recipe videos
-        await modelVideo.deleteRecipeVideos(id);
-
-        //Add recipe videos
-        const videos = data.videos ? JSON.parse(data.videos) : [];
-        videos.forEach(async (element) => {
-            element.id = uuidv4();
-            element.id_recipe = data.id;
-            await modelVideo.insertVideo(element);
-        });
-        
-        //Update recipe
-        const result = await modelRecipe.updateRecipe(data);
+        //Update recipe in database
+        data.id = id;
+        data.updated_at = Date.now();
+        const result = await recipeModel.updateRecipe(data);
 
         //Response
         commonHelper.response(res, result.rows, 201, "Recipe updated");
@@ -147,20 +135,24 @@ const updateRecipe = async (req, res) => {
 
 const deleteRecipe = async (req, res) => {
     try {
-        //Check if recipe exists in database
+        //Get request recipe id
         const id = req.params.id;
-        const findIdResults = await modelRecipe.findId(id);
-        if (!findIdResults.rowCount) 
-            return commonHelper.response(res, null, 404, "Recipe not found");
+        const id_user = req.payload.id;
+
+        //Check if recipe exists in database
+        const recipeResult = await recipeModel.selectRecipe(id);
+        if (!recipeResult.rowCount)
+            return commonHelper.response(res, null, 404,
+                "Recipe not found or already deleted");
 
         //Check if recipe is created by user logged in
-        if(findIdResults.rows[0].id_user != req.payload.id) 
-            return commonHelper.response(res, null, 403, 
+        if (recipeResult.rows[0].id_user != id_user)
+            return commonHelper.response(res, null, 403,
                 "Deleting recipe created by other user is not allowed");
 
         //Delete recipe
-        const result = await modelRecipe.deleteRecipe(id);
-        
+        const result = await recipeModel.deleteRecipe(id);
+
         //Response
         commonHelper.response(res, result.rows, 200, "Recipe deleted");
     } catch (error) {
