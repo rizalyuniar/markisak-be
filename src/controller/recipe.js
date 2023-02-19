@@ -90,7 +90,7 @@ const createRecipe = async (req, res) => {
         const result = await recipeModel.insertRecipe(data);
 
         //Response
-        commonHelper.response(res, [id], 201, "Recipe added");
+        commonHelper.response(res, [data.id], 201, "Recipe added");
     } catch (error) {
         console.log(error);
         commonHelper.response(res, null, 500, "Failed adding recipe");
@@ -127,7 +127,7 @@ const updateRecipe = async (req, res) => {
         const result = await recipeModel.updateRecipe(data);
 
         //Response
-        commonHelper.response(res, [id], 201, "Recipe updated");
+        commonHelper.response(res, [data.id], 201, "Recipe updated");
     } catch (error) {
         console.log(error);
         commonHelper.response(res, null, 500, "Failed updating recipe");
