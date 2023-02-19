@@ -137,6 +137,7 @@ const updateUser = async (req, res) => {
     try {
         // Calling select method from model
         const result = await userModel.selectUser(paramId);
+
         if (result.rowCount > 0) {
             if (typeof req.body.name == "undefined" || req.body.name == "") {
                 req.body.name = result.rows[0].name;
@@ -160,26 +161,35 @@ const updateUser = async (req, res) => {
                 const salt = bcrypt.genSaltSync(10);
                 req.body.queryPwd = bcrypt.hashSync(req.body.password, salt);
             }
+
             try {
                 req.body.queryFilename = `http://${HOST}:${PORT}/${req.file.filename}`;
                 // Add photo removal function here
             } catch (err) {
                 req.body.queryFilename = result.rows[0].photo;
             }
-            userModel.updateUser(req.body).then((rslt) => {
-                return commonHelper.response(
-                    res,
-                    rslt.rows,
-                    200,
-                    "User Updated"
-                );
-            });
+
+            userModel
+                .updateUser(req.body)
+                .then((rslt) => {
+                    return commonHelper.response(
+                        res,
+                        rslt.rows,
+                        200,
+                        "User Updated"
+                    );
+                })
+                .catch((err) => {
+                    console.log(err);
+                    return commonHelper.response(res, null, 401, err.detail);
+                });
         } else {
             return commonHelper.response(res, null, 404, "No matching id");
         }
+        console.log("henlo");
     } catch (err) {
         console.log(err);
-        return commonHelper.response(res, null, 500, "Failed to update user");
+        return commonHelper.response(res, null, 500, "Update failed");
     }
 };
 
