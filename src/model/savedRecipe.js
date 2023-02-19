@@ -36,7 +36,7 @@ const findUserSavedRecipe = (id_recipe, id_user) => {
 
 const countData = () => {
     return new Promise((resolve, reject) =>
-        pool.query(`select count(*) from saved_recipes'`,
+        pool.query(`select count(*) from saved_recipes`,
             (error, result) => (!error) ? resolve(result) : reject(error)));
 }
 

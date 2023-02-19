@@ -35,7 +35,7 @@ const deleteComment = (id) => {
 
 const countData = () => {
     return new Promise((resolve, reject) =>
-        pool.query(`select count(*) from comments'`,
+        pool.query(`select count(*) from comments`,
             (error, result) => !error ? resolve(result) : reject(error)));
 }
 
