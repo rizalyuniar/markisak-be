@@ -106,7 +106,6 @@ const registerUser = (req, res) => {
     req.body.queryId = uuidv4();
     // Adding photo filename to req body
     const HOST = process.env.RAILWAY_STATIC_URL;
-    const PORT = process.env.RAILWAY_STATIC_PORT;
     console.log(req.body);
     // Creating hash password
     const salt = bcrypt.genSaltSync(10);
@@ -132,7 +131,6 @@ const updateUser = async (req, res) => {
     // Adding id
     req.body.id = paramId;
     const HOST = process.env.RAILWAY_STATIC_URL;
-    const PORT = process.env.RAILWAY_STATIC_PORT;
     // Set default if no photo data passed
     try {
         // Calling select method from model
@@ -163,7 +161,7 @@ const updateUser = async (req, res) => {
             }
 
             try {
-                req.body.queryFilename = `http://${HOST}:${PORT}/${req.file.filename}`;
+                req.body.queryFilename = `http://${HOST}/${req.file.filename}`;
                 // Add photo removal function here
             } catch (err) {
                 req.body.queryFilename = result.rows[0].photo;
