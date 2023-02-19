@@ -14,6 +14,7 @@ const getRecipeComments = async (req, res) => {
         const page = Number(req.query.page) || 1;
         const offset = (page - 1) * limit;
 
+        
         //Check if recipe exists in database
         const resultRecipe = await recipeModel.selectRecipe(id_recipe);
         if (!resultRecipe.rowCount) return commonHelper

@@ -25,7 +25,8 @@ const getAllRecipes = async (req, res) => {
             .response(res, null, 404, "Recipes not found");
 
         //Pagination info
-        const totalData = Number(results.rowCount);
+        const { rows: [count] } = await recipeModel.countData();
+        const totalData = Number(count.count);
         const totalPage = Math.ceil(totalData / limit);
         const pagination = { currentPage: page, limit, totalData, totalPage };
 

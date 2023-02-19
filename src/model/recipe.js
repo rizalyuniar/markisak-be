@@ -34,7 +34,9 @@ const deleteRecipe = (id) => {
 }
 
 const countData = () => {
-        pool.query(`select count(*) from recipes'`);
+    return new Promise((resolve, reject) =>
+        pool.query(`select count(*) from recipes'`,
+            (error, result) => (!error) ? resolve(result) : reject(error)));
 }
 
 module.exports = {
