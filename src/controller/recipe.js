@@ -78,8 +78,8 @@ const createRecipe = async (req, res) => {
         //Get recipe photo
         if (req.file == undefined) return commonHelper
             .response(res, null, 400, "Please input photo");
-        const HOST = process.env.HOST;
-        const PORT = process.env.PORT;
+        const HOST = process.env.RAILWAY_STATIC_URL;
+        const PORT = process.env.RAILWAY_STATIC_PORT;
         data.photo = `http://${HOST}:${PORT}/img/${req.file.filename}`;
 
         //Insert recipe to database
@@ -117,8 +117,8 @@ const updateRecipe = async (req, res) => {
         //Get recipe photo
         if (req.file == undefined) return commonHelper
             .response(res, null, 400, "Please input photo");
-        const HOST = process.env.HOST;
-        const PORT = process.env.PORT;
+        const HOST = process.env.RAILWAY_STATIC_URL;
+        const PORT = process.env.RAILWAY_STATIC_PORT;
         data.photo = `http://${HOST}:${PORT}/img/${req.file.filename}`;
 
         //Update recipe in database
