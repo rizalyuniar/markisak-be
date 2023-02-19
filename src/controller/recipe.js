@@ -78,8 +78,8 @@ const createRecipe = async (req, res) => {
         //Get recipe photo
         if (req.file == undefined) return commonHelper
             .response(res, null, 400, "Please input photo");
-        const HOST = process.env.HOST || 'localhost';
-        const PORT = process.env.PORT || 443;
+        const HOST = process.env.HOST;
+        const PORT = process.env.PORT;
         data.photo = `http://${HOST}:${PORT}/img/${req.file.filename}`;
 
         //Insert recipe to database
