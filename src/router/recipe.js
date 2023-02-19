@@ -4,6 +4,7 @@ const router = express.Router();
 
 //Import controller functions
 const recipeController = require("../controller/recipe.js");
+const videoController = require("../controller/video.js");
 const commentController = require("../controller/comment.js");
 const likedRecipeController = require("../controller/likedRecipe.js");
 const savedRecipeController = require("../controller/savedRecipe.js");
@@ -18,6 +19,13 @@ router.get('/:id', recipeController.getDetailRecipe);
 router.post('/', authMiddleware.protect, upload.single("photo"), recipeController.createRecipe);
 router.put('/:id', authMiddleware.protect, upload.single("photo"), recipeController.updateRecipe);
 router.delete('/:id', authMiddleware.protect, recipeController.deleteRecipe);
+
+//Recipe video router
+router.get('/:id_recipe/video', videoController.getRecipeVideos);
+router.get('/:id_recipe/video/:id_video', videoController.getDetailVideo);
+router.post('/:id_recipe/video', authMiddleware.protect, videoController.createVideo);
+router.put('/:id_recipe/video/:id_video', authMiddleware.protect, videoController.updateVideo);
+router.delete('/:id_recipe/video/:id_video', authMiddleware.protect, videoController.deleteVideo);
 
 //Recipe comment router
 router.get('/:id_recipe/comment', commentController.getRecipeComments);

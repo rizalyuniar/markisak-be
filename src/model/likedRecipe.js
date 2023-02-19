@@ -34,11 +34,16 @@ const findUserLikedRecipe = (id_recipe, id_user) => {
             (error, result) => !error ? resolve(result) : reject(error)));
 }
 
+const countData = () => {
+    pool.query(`select count(*) from liked_recipes'`);
+}
+
 module.exports = {
     selectLikedRecipe,
     selectDetailLikedRecipe,
     insertLikedRecipe,
     deleteLikedRecipe,
     findId,
-    findUserLikedRecipe
+    findUserLikedRecipe,
+    countData
 }
