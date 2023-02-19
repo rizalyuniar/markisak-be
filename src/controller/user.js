@@ -107,6 +107,8 @@ const registerUser = (req, res) => {
     // Adding photo filename to req body
     const HOST = process.env.RAILWAY_STATIC_URL;
     console.log(req.body);
+    // Adding default photo
+    req.body.queryFilename = "photo.jpg";
     // Creating hash password
     const salt = bcrypt.genSaltSync(10);
     req.body.queryPwd = bcrypt.hashSync(req.body.password, salt);
