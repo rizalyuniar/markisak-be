@@ -25,7 +25,7 @@ const getSavedRecipe = async (req, res) => {
         if (!result.rows[0]) return commonHelper.response(res, null, 404, "Saved recipe not found");
 
         //Pagination info
-        const { rows: [count] } = await modelSavedRecipe.countData();
+        const { rows: [count] } = await modelSavedRecipe.countData(id_recipe);
         const totalData = Number(count.count);
         const totalPage = Math.ceil(totalData / limit);
         const pagination = { currentPage: page, limit, totalData, totalPage };

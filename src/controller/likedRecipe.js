@@ -25,7 +25,7 @@ const getLikedRecipe = async (req, res) => {
         if (!result.rows[0]) return commonHelper.response(res, null, 404, "Liked recipe not found");
 
         //Pagination info
-        const { rows: [count] } = await modelLikedRecipe.countData();
+        const { rows: [count] } = await modelLikedRecipe.countData(id_recipe);
         const totalData = Number(count.count);
         const totalPage = Math.ceil(totalData / limit);
         const pagination = { currentPage: page, limit, totalData, totalPage };

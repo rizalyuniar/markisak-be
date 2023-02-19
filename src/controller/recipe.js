@@ -90,7 +90,7 @@ const createRecipe = async (req, res) => {
         const result = await recipeModel.insertRecipe(data);
 
         //Response
-        commonHelper.response(res, [data.id], 201, "Recipe added");
+        commonHelper.response(res, [{id:data.id}], 201, "Recipe added");
     } catch (error) {
         console.log(error);
         commonHelper.response(res, null, 500, "Failed adding recipe");
@@ -117,8 +117,8 @@ const updateRecipe = async (req, res) => {
         //Get recipe photo
         if (req.file == undefined) return commonHelper
             .response(res, null, 400, "Please input photo");
-        const HOST = process.env.HOST || 'localhost';
-        const PORT = process.env.PORT || 443;
+        const HOST = process.env.HOST;
+        const PORT = process.env.PORT;
         data.photo = `http://${HOST}:${PORT}/img/${req.file.filename}`;
 
         //Update recipe in database
@@ -127,7 +127,7 @@ const updateRecipe = async (req, res) => {
         const result = await recipeModel.updateRecipe(data);
 
         //Response
-        commonHelper.response(res, [data.id], 201, "Recipe updated");
+        commonHelper.response(res, [{id:data.id}], 201, "Recipe updated");
     } catch (error) {
         console.log(error);
         commonHelper.response(res, null, 500, "Failed updating recipe");

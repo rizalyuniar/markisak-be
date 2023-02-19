@@ -29,7 +29,7 @@ const getRecipeComments = async (req, res) => {
             .response(res, null, 404, "Recipe comments not found");
 
         //Pagination info
-        const { rows: [count] } = await commentModel.countData();
+        const { rows: [count] } = await commentModel.countData(id_recipe);
         const totalData = Number(count.count);
         const totalPage = Math.ceil(totalData / limit);
         const pagination = { currentPage: page, limit, totalData, totalPage };
@@ -91,7 +91,7 @@ const createComment = async (req, res) => {
         const result = await commentModel.insertComment(data);
 
         //Response
-        commonHelper.response(res, [data.id], 201, "Comment added");
+        commonHelper.response(res, [{id:data.id}], 201, "Comment added");
     } catch (error) {
         console.log(error);
         commonHelper.response(res, null, 500, "Failed adding comment");
@@ -124,7 +124,7 @@ const updateComment = async (req, res) => {
         const result = await commentModel.updateComment(data);
 
         //Response
-        commonHelper.response(res, [data.id], 201, "Comment updated");
+        commonHelper.response(res, [{id:data.id}], 201, "Comment updated");
     } catch (error) {
         console.log(error);
         commonHelper.response(res, null, 500, "Failed updating comment");
