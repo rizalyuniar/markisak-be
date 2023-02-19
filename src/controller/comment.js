@@ -29,7 +29,7 @@ const getRecipeComments = async (req, res) => {
             .response(res, null, 404, "Recipe comments not found");
 
         //Pagination info
-        const { rows: [count] } = await commentModel.countData();
+        const { rows: [count] } = await commentModel.countData(id_recipe);
         const totalData = Number(count.count);
         const totalPage = Math.ceil(totalData / limit);
         const pagination = { currentPage: page, limit, totalData, totalPage };

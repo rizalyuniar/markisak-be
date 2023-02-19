@@ -1,7 +1,7 @@
 const pool = require('../config/db');
 
 const selectRecipeComments = (id_recipe, sortBy = 'updated_at', sort = 'desc', limit = '100', offset = '0') => {
-    return pool.query(`SELECT comments.id, users.id, users.name AS name, 
+    return pool.query(`SELECT comments.id AS id, users.id AS id_user, users.name AS name, 
         users.photo AS photo, comments.message, comments.created_at, 
         comments.updated_at FROM comments INNER JOIN users 
         ON comments.id_user = users.id WHERE id_recipe='${id_recipe}' 
@@ -10,11 +10,11 @@ const selectRecipeComments = (id_recipe, sortBy = 'updated_at', sort = 'desc', l
 
 const selectComment = (id) => {
     return new Promise((resolve, reject) =>
-        pool.query(`SELECT comments.id, users.name AS name, 
-            users.photo AS photo, comments.message, comments.created_at 
-            FROM comments INNER JOIN users ON comments.id_user = users.id 
-            WHERE comments.id='${id}'`, (error, result) =>
-            !error ? resolve(result) : reject(error)));
+        pool.query(`SELECT comments.id AS id, users.id AS id_user, users.name AS name, 
+        users.photo AS photo, comments.message, comments.created_at, 
+        comments.updated_at FROM comments INNER JOIN users 
+        ON comments.id_user = users.id WHERE comments.id='${id}' `, 
+        (error, result) => !error ? resolve(result) : reject(error)));
 }
 
 const insertComment = (data) => {
@@ -33,9 +33,9 @@ const deleteComment = (id) => {
     return pool.query(`DELETE FROM comments WHERE id='${id}'`);
 }
 
-const countData = () => {
+const countData = (id_recipe) => {
     return new Promise((resolve, reject) =>
-        pool.query(`select count(*) from comments`,
+        pool.query(`select count(*) from comments where id_recipe='${id_recipe}'`,
             (error, result) => !error ? resolve(result) : reject(error)));
 }
 
