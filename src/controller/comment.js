@@ -91,7 +91,7 @@ const createComment = async (req, res) => {
         const result = await commentModel.insertComment(data);
 
         //Response
-        commonHelper.response(res, [id], 201, "Comment added");
+        commonHelper.response(res, [data.id], 201, "Comment added");
     } catch (error) {
         console.log(error);
         commonHelper.response(res, null, 500, "Failed adding comment");
@@ -124,7 +124,7 @@ const updateComment = async (req, res) => {
         const result = await commentModel.updateComment(data);
 
         //Response
-        commonHelper.response(res, [id], 201, "Comment updated");
+        commonHelper.response(res, [data.id], 201, "Comment updated");
     } catch (error) {
         console.log(error);
         commonHelper.response(res, null, 500, "Failed updating comment");
