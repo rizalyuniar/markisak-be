@@ -26,7 +26,7 @@ const updateRecipe = (data) => {
     const { id, title, photo, ingredients, updated_at, description } = data;
     return pool.query(`UPDATE recipes SET title='${title}', 
         ingredients='${ingredients}', photo='${photo}', updated_at='${updated_at}', 
-        description='${description}', WHERE id='${id}'`);
+        description='${description}' WHERE id='${id}'`);
 }
 
 const deleteRecipe = (id) => {
