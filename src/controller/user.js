@@ -105,8 +105,8 @@ const registerUser = (req, res) => {
     // Creating random id
     req.body.queryId = uuidv4();
     // Adding photo filename to req body
-    const HOST = process.env.HOST;
-    const PORT = process.env.PORT;
+    const HOST = process.env.RAILWAY_STATIC_URL;
+    const PORT = process.env.RAILWAY_STATIC_PORT;
     console.log(req.body);
     // Creating hash password
     const salt = bcrypt.genSaltSync(10);
@@ -131,8 +131,8 @@ const updateUser = async (req, res) => {
     const paramId = req.params.id;
     // Adding id
     req.body.id = paramId;
-    const HOST = process.env.HOST;
-    const PORT = process.env.PORT;
+    const HOST = process.env.RAILWAY_STATIC_URL;
+    const PORT = process.env.RAILWAY_STATIC_PORT;
     // Set default if no photo data passed
     try {
         // Calling select method from model
