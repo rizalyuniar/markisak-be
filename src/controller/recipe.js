@@ -25,7 +25,8 @@ const getAllRecipes = async (req, res) => {
             .response(res, null, 404, "Recipes not found");
 
         //Pagination info
-        const totalData = Number(results.rowCount);
+        const { rows: [count] } = await recipeModel.countData();
+        const totalData = Number(count.count);
         const totalPage = Math.ceil(totalData / limit);
         const pagination = { currentPage: page, limit, totalData, totalPage };
 
@@ -89,7 +90,7 @@ const createRecipe = async (req, res) => {
         const result = await recipeModel.insertRecipe(data);
 
         //Response
-        commonHelper.response(res, result.rows, 201, "Recipe added");
+        commonHelper.response(res, [id], 201, "Recipe added");
     } catch (error) {
         console.log(error);
         commonHelper.response(res, null, 500, "Failed adding recipe");
@@ -126,7 +127,7 @@ const updateRecipe = async (req, res) => {
         const result = await recipeModel.updateRecipe(data);
 
         //Response
-        commonHelper.response(res, result.rows, 201, "Recipe updated");
+        commonHelper.response(res, [id], 201, "Recipe updated");
     } catch (error) {
         console.log(error);
         commonHelper.response(res, null, 500, "Failed updating recipe");

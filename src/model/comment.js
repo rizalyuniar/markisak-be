@@ -13,8 +13,8 @@ const selectComment = (id) => {
         pool.query(`SELECT comments.id, users.name AS name, 
             users.photo AS photo, comments.message, comments.created_at 
             FROM comments INNER JOIN users ON comments.id_user = users.id 
-            WHERE comments.id='${id}'`, (error, result) => 
-                !error ? resolve(result) : reject(error)));
+            WHERE comments.id='${id}'`, (error, result) =>
+            !error ? resolve(result) : reject(error)));
 }
 
 const insertComment = (data) => {
@@ -34,7 +34,9 @@ const deleteComment = (id) => {
 }
 
 const countData = () => {
-    pool.query(`select count(*) from comments'`);
+    return new Promise((resolve, reject) =>
+        pool.query(`select count(*) from comments'`,
+            (error, result) => !error ? resolve(result) : reject(error)));
 }
 
 module.exports = {

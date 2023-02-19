@@ -14,6 +14,7 @@ const getRecipeComments = async (req, res) => {
         const page = Number(req.query.page) || 1;
         const offset = (page - 1) * limit;
 
+        
         //Check if recipe exists in database
         const resultRecipe = await recipeModel.selectRecipe(id_recipe);
         if (!resultRecipe.rowCount) return commonHelper
@@ -90,7 +91,7 @@ const createComment = async (req, res) => {
         const result = await commentModel.insertComment(data);
 
         //Response
-        commonHelper.response(res, result.rows, 201, "Comment added");
+        commonHelper.response(res, [id], 201, "Comment added");
     } catch (error) {
         console.log(error);
         commonHelper.response(res, null, 500, "Failed adding comment");
@@ -123,7 +124,7 @@ const updateComment = async (req, res) => {
         const result = await commentModel.updateComment(data);
 
         //Response
-        commonHelper.response(res, result.rows, 201, "Comment updated");
+        commonHelper.response(res, [id], 201, "Comment updated");
     } catch (error) {
         console.log(error);
         commonHelper.response(res, null, 500, "Failed updating comment");
