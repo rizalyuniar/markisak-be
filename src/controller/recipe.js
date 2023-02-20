@@ -82,7 +82,7 @@ const createRecipe = async (req, res) => {
 
         //Check if recipe title already exists
         const recipeTitleResult = await recipeModel.selectRecipeTitle(title);
-        if (recipeTitleResult.rows) return commonHelper
+        if (recipeTitleResult.rowCount > 0) return commonHelper
             .response(res, null, 403, "Recipe title already exists");
         
         //Get recipe photo
