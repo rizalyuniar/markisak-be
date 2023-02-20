@@ -117,6 +117,8 @@ const registerUser = async (req, res) => {
     queryPwd = bcrypt.hashSync(req.body.password, salt);
     // Creating random id
     queryId = uuidv4();
+    // Email lowecase
+    req.body.email = req.body.email.toLowerCase();
     // Creating payload for jwt
     const payload = {
         name: req.body.name,

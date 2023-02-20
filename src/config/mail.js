@@ -18,7 +18,7 @@ function sendMail(token, email) {
         from: process.env.EMAIL_SENDER, // sender address
         to: email, // list of receivers
         subject: "Markisak Activation Link", // Subject line
-        html: `<b>http://${process.env.HOST}:${process.env.PORT}/v1/user/verif/${token}</b>`, // html body
+        html: `<b>http://localhost:5173/user/verif/${token}</b>`, // html body
     });
     return;
 }
