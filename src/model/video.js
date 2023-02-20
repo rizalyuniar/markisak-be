@@ -5,9 +5,9 @@ const selectRecipeVideos = (id_recipe) => {
         ORDER BY step ASC`);
 }
 
-const selectVideo = (id) => {
+const selectVideo = (id, id_recipe) => {
     return new Promise((resolve, reject) =>
-        pool.query(`SELECT * FROM videos WHERE id='${id}' ORDER BY step ASC`, 
+        pool.query(`SELECT * FROM videos WHERE id='${id}' AND id_recipe='${id_recipe}' ORDER BY step ASC`, 
             (error, result) => !error ? resolve(result) : reject(error)));
 }
 

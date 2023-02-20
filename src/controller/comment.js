@@ -13,13 +13,12 @@ const getRecipeComments = async (req, res) => {
         const limit = Number(req.query.limit) || 10;
         const page = Number(req.query.page) || 1;
         const offset = (page - 1) * limit;
-
         
         //Check if recipe exists in database
         const resultRecipe = await recipeModel.selectRecipe(id_recipe);
         if (!resultRecipe.rowCount) return commonHelper
             .response(res, null, 404, "Recipe not found");
-
+        
         //Get recipe comments
         const results = await commentModel
             .selectRecipeComments(id_recipe, sortBy, sort, limit, offset);
@@ -33,6 +32,10 @@ const getRecipeComments = async (req, res) => {
         const totalData = Number(count.count);
         const totalPage = Math.ceil(totalData / limit);
         const pagination = { currentPage: page, limit, totalData, totalPage };
+
+        //Return if page params is more than total page
+        if(page > totalPage) return commonHelper
+            .response(res, null, 404, "Page invalid", pagination);
 
         //Response
         commonHelper.response(res, results.rows, 200,
@@ -112,8 +115,12 @@ const updateComment = async (req, res) => {
         if (!recipeResult.rowCount) return commonHelper
             .response(res, null, 404, "Recipe not found");
 
-        //Check if comment is created by user logged in
+        //Check if comment exists in database
         const findCommentResult = await commentModel.selectComment(id);
+        if (!findCommentResult.rowCount) return commonHelper
+            .response(res, null, 404, "Comment not found");
+
+        //Check if comment is created by user logged in
         if (findCommentResult.rows[0].id_user != id_user)
             return commonHelper.response(res, null, 403,
                 "Updating comment created by other user is not allowed");

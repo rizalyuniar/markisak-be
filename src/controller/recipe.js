@@ -30,6 +30,10 @@ const getAllRecipes = async (req, res) => {
         const totalPage = Math.ceil(totalData / limit);
         const pagination = { currentPage: page, limit, totalData, totalPage };
 
+        //Return if page params more than total page
+        if(page > totalPage) return commonHelper
+            .response(res, null, 404, "Page invalid", pagination);
+
         //Response
         commonHelper.response(res, results.rows, 200,
             "Get all recipes successful", pagination);
@@ -77,7 +81,7 @@ const createRecipe = async (req, res) => {
         const title = data.title;
 
         //Check if recipe title already exists
-        const recipeTitleResult = recipeModel.selectRecipeTitle(title);
+        const recipeTitleResult = await recipeModel.selectRecipeTitle(title);
         if (recipeTitleResult.rows) return commonHelper
             .response(res, null, 403, "Recipe title already exists");
         

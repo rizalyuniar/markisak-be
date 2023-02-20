@@ -45,7 +45,7 @@ const getDetailVideo = async (req, res) => {
             .response(res, null, 404, "Recipe not found");
 
         //Get detail recipe video from database
-        const result = await videoModel.selectVideo(id);
+        const result = await videoModel.selectVideo(id, id_recipe);
 
         //Return not found if there's no recipe video in database
         if (!result.rowCount) return commonHelper
@@ -112,6 +112,11 @@ const updateVideo = async (req, res) => {
         if (!recipeResult.rowCount) return commonHelper
             .response(res, null, 404, "Recipe not found");
 
+        //Check if recipe video doesn't exist
+        const result = await videoModel.selectVideo(id, id_recipe);
+        if (!result.rowCount) return commonHelper
+            .response(res, null, 404, "Recipe video not found");
+
         //Check if recipe is created by user logged in
         if (recipeResult.rows[0].id_user != id_user)
             return commonHelper.response(res, null, 403,
@@ -153,7 +158,7 @@ const deleteVideo = async (req, res) => {
                 "Deleting video step in a recipe created by other user is not allowed");
 
         //Check if video step doesn't exist
-        const videoResult = await videoModel.selectVideo(id);
+        const videoResult = await videoModel.selectVideo(id, id_recipe);
         if (!videoResult.rowCount) return commonHelper.response(res, null, 404,
             `Video step doesn't exist or already deleted`);
 

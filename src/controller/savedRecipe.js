@@ -23,12 +23,16 @@ const getAllSavedRecipe = async (req, res) => {
 
         //Return not found if there's no saved recipe in database
         if (!result.rows[0]) return commonHelper.response(res, null, 404, "No one have saved this recipe");
-
+        
         //Pagination info
         const { rows: [count] } = await modelSavedRecipe.countData(id_recipe);
         const totalData = Number(count.count);
         const totalPage = Math.ceil(totalData / limit);
         const pagination = { currentPage: page, limit, totalData, totalPage };
+
+        //Return if page params more than total page
+        if(page > totalPage) return commonHelper
+            .response(res, null, 404, "Page invalid", pagination);
 
         //Response
         commonHelper.response(res, result.rows, 200, "Get saved recipe successful", pagination);
@@ -128,9 +132,29 @@ const deleteSavedRecipe = async (req, res) => {
     }
 }
 
+const getUserSavedRecipes = async (req, res) => {
+    try {
+        //Get request user id
+        const id_user = req.payload.id;
+
+        //Check if user already saved recipe
+        const result = await modelSavedRecipe.selectUserSavedRecipes(id_user);
+        if (!result.rowCount) return commonHelper
+            .response(res, null, 404, "User haven't saved any recipe");
+
+        //Response
+        commonHelper.response(res, result.rows, 200, 
+            "Get user saved recipes successful");
+    } catch (error) {
+        console.log(error);
+        commonHelper.response(res, null, 500, "Failed getting user saved recipes");
+    }
+}
+
 module.exports = {
     getAllSavedRecipe,
     getDetailSavedRecipe,
     createSavedRecipe,
-    deleteSavedRecipe
+    deleteSavedRecipe,
+    getUserSavedRecipes
 }

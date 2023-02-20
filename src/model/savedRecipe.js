@@ -35,11 +35,19 @@ const countData = (id_recipe) => {
             (error, result) => (!error) ? resolve(result) : reject(error)));
 }
 
+const selectUserSavedRecipes = (id_user) => {
+    return new Promise((resolve, reject) =>
+        pool.query(`SELECT * FROM saved_recipes 
+            WHERE id_user='${id_user}'`, 
+            (error, result) => !error ? resolve(result) : reject(error)));
+}
+
 module.exports = {
     selectSavedRecipe,
     selectDetailSavedRecipe,
     insertSavedRecipe,
     deleteSavedRecipe,
     selectUserSavedRecipe,
-    countData
+    countData,
+    selectUserSavedRecipes
 }

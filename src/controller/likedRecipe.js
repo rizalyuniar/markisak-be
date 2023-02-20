@@ -30,6 +30,10 @@ const getAllLikedRecipe = async (req, res) => {
         const totalPage = Math.ceil(totalData / limit);
         const pagination = { currentPage: page, limit, totalData, totalPage };
 
+        //Return if page params more than total page
+        if(page > totalPage) return commonHelper
+            .response(res, null, 404, "Page invalid", pagination);
+
         //Response
         commonHelper.response(res, result.rows, 200, "Get liked recipe successful", pagination);
     } catch (error) {
@@ -128,9 +132,29 @@ const deleteLikedRecipe = async (req, res) => {
     }
 }
 
+const getUserLikedRecipes = async (req, res) => {
+    try {
+        //Get request user id
+        const id_user = req.payload.id;
+
+        //Check if user already liked recipe
+        const result = await modelLikedRecipe.selectUserLikedRecipes(id_user);
+        if (!result.rowCount) return commonHelper
+            .response(res, null, 404, "User haven't liked any recipe");
+
+        //Response
+        commonHelper.response(res, result.rows, 200, 
+            "Get user liked recipes successful");
+    } catch (error) {
+        console.log(error);
+        commonHelper.response(res, null, 500, "Failed getting user liked recipes");
+    }
+}
+
 module.exports = {
     getAllLikedRecipe,
     getDetailLikedRecipe,
     createLikedRecipe,
-    deleteLikedRecipe
+    deleteLikedRecipe,
+    getUserLikedRecipes
 }
