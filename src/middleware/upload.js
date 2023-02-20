@@ -24,7 +24,7 @@ const upload = multer({
     fileFilter: (req, file, cb) => {
         let size = +req.rawHeaders.slice(-1)[0];
         console.log(size)
-        if (size > 2 * 1024 * 1024 + 4000) {
+        if (size > 2 * 1024 * 1024) {
             return cb(new createError(413, 'Image size too large (Max 2MB)'));
         }
 
