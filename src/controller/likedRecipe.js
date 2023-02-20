@@ -119,7 +119,7 @@ const deleteLikedRecipe = async (req, res) => {
         const selectUserLikedRecipe = await modelLikedRecipe
             .selectUserLikedRecipe(id_recipe, id_user)
         if (!selectUserLikedRecipe.rowCount) return commonHelper
-            .response(res, null, 403, "User haven't liked recipe");
+            .response(res, null, 404, "User haven't liked recipe");
 
         //Delete liked recipe
         const results = await modelLikedRecipe.deleteLikedRecipe(id_recipe, id_user);

@@ -119,7 +119,7 @@ const deleteSavedRecipe = async (req, res) => {
         const selectUserSavedRecipe = await modelSavedRecipe
             .selectUserSavedRecipe(id_recipe, id_user)
         if (!selectUserSavedRecipe.rowCount) return commonHelper
-            .response(res, null, 403, "User haven't saved recipe");
+            .response(res, null, 404, "User haven't saved recipe");
 
         //Delete saved recipe
         const results = await modelSavedRecipe.deleteSavedRecipe(id_recipe, id_user);
