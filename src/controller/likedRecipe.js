@@ -4,25 +4,25 @@ const commonHelper = require('../helper/common');
 const modelLikedRecipe = require('../model/likedRecipe');
 const modelRecipe = require('../model/recipe');
 
-const getLikedRecipe = async (req, res) => {
+const getAllLikedRecipe = async (req, res) => {
     try {
-        //Params and pagination query
-        const sortBy = req.query.sortBy || 'updated_at';
+        //Get recipe id, params, and pagination query
+        const id_recipe = req.params.id_recipe;
+        const sortBy = req.query.sortBy || 'created_at';
         const sort = req.query.sort || 'desc';
         const limit = Number(req.query.limit) || 10;
         const page = Number(req.query.page) || 1;
         const offset = (page - 1) * limit;
 
-        //Check if recipe exists in db
-        const id_recipe = req.params.id_recipe;
-        const { rowCount } = await modelRecipe.findId(id_recipe);
-        if (!rowCount) return commonHelper.response(res, null, 404, "Recipe not found");
+        //Check if recipe exists in database
+        const recipeResults = await modelRecipe.selectRecipe(id_recipe);
+        if (!recipeResults.rowCount) return commonHelper.response(res, null, 404, "Recipe not found");
 
-        //Get Liked Recipe 
+        //Get Liked Recipe from database
         const result = await modelLikedRecipe.selectLikedRecipe(id_recipe, sortBy, sort, limit, offset);
 
         //Return not found if there's no liked recipe in database
-        if (!result.rows[0]) return commonHelper.response(res, null, 404, "Liked recipe not found");
+        if (!result.rows[0]) return commonHelper.response(res, null, 404, "No one have liked this recipe");
 
         //Pagination info
         const { rows: [count] } = await modelLikedRecipe.countData(id_recipe);
@@ -40,21 +40,25 @@ const getLikedRecipe = async (req, res) => {
 
 const getDetailLikedRecipe = async (req, res) => {
     try {
-        //Check if recipe exists in db
+        //Get request liked recipe id and recipe
+        const id = req.params.id_liked_recipe;
         const id_recipe = req.params.id_recipe;
-        const findIdRecipe = await modelRecipe.findId(id_recipe);
-        if (!findIdRecipe.rowCount) return commonHelper.response(res, null, 404, "Recipe not found");
-        
-        //Check if liked recipe exists in database
-        const id_liked_recipe = req.params.id_liked_recipe;
-        const findIdLikedRecipe = await modelLikedRecipe.findId(id_liked_recipe);
-        if (!findIdLikedRecipe.rowCount) return commonHelper.response(res, null, 404, "Liked recipe not found");
 
+        //Check if recipe exists in db
+        const recipeResults = await modelRecipe.selectRecipe(id_recipe);
+        if (!recipeResults.rowCount) return commonHelper
+            .response(res, null, 404, "Recipe not found");
+        
         //Get detail liked recipe
-        const result = await modelLikedRecipe.selectDetailLikedRecipe(id_recipe, id_liked_recipe);
+        const result = await modelLikedRecipe.selectDetailLikedRecipe(id);
+        
+        //Return not found if there's no recipe in database
+        if (!result.rowCount) return commonHelper.response(res, null, 404, 
+            "Liked recipe not found");
 
         //Response
-        commonHelper.response(res, result.rows, 200, "Get detail liked recipe successful");
+        commonHelper.response(res, result.rows, 200, 
+            "Get detail liked recipe successful");
     } catch (error) {
         console.log(error);
         commonHelper.response(res, null, 500, "Failed getting detail liked recipe");
@@ -63,16 +67,20 @@ const getDetailLikedRecipe = async (req, res) => {
 
 const createLikedRecipe = async (req, res) => {
     try {
-        //Check if recipe exists in db
+        //Get request recipe id and user id
         const id_recipe = req.params.id_recipe;
-        const findIdRecipe = await modelRecipe.findId(id_recipe);
-        if (!findIdRecipe.rowCount) return commonHelper.response(res, null, 404, "Recipe not found");
-
-        //Check if user already liked recipe
         const id_user = req.payload.id;
-        const findUserLikedRecipe = await modelLikedRecipe.findUserLikedRecipe(id_recipe, id_user)
-        if (findUserLikedRecipe.rowCount) 
-            return commonHelper.response(res, null, 403, "User already liked recipe");
+
+        //Check if recipe exists in db
+        const recipeResults = await modelRecipe.selectRecipe(id_recipe);
+        if (!recipeResults.rowCount) return commonHelper
+            .response(res, null, 404, "Recipe not found");
+        
+        //Check if user already liked recipe
+        const selectUserLikedRecipe = await modelLikedRecipe
+            .selectUserLikedRecipe(id_recipe, id_user)
+        if (selectUserLikedRecipe.rowCount) return commonHelper
+            .response(res, null, 403, "User already liked recipe");
 
         //Liked recipe metadata
         const data = {};
@@ -94,16 +102,20 @@ const createLikedRecipe = async (req, res) => {
 
 const deleteLikedRecipe = async (req, res) => {
     try {
-        //Check if recipe exists in db
+        //Get request recipe id and user id
         const id_recipe = req.params.id_recipe;
-        const findIdRecipe = await modelRecipe.findId(id_recipe);
-        if (!findIdRecipe.rowCount) return commonHelper.response(res, null, 404, "Recipe not found");
+        const id_user = req.payload.id;
+        
+        //Check if recipe exists in db
+        const recipeResults = await modelRecipe.selectRecipe(id_recipe);
+        if (!recipeResults.rowCount) return commonHelper
+            .response(res, null, 404, "Recipe not found");
 
         //Check if user haven't liked recipe
-        const id_user = req.payload.id;
-        const findUserLikedRecipe = await modelLikedRecipe.findUserLikedRecipe(id_recipe, id_user)
-        if (!findUserLikedRecipe.rowCount) 
-            return commonHelper.response(res, null, 403, "User haven't liked recipe");
+        const selectUserLikedRecipe = await modelLikedRecipe
+            .selectUserLikedRecipe(id_recipe, id_user)
+        if (!selectUserLikedRecipe.rowCount) return commonHelper
+            .response(res, null, 403, "User haven't liked recipe");
 
         //Delete liked recipe
         const results = await modelLikedRecipe.deleteLikedRecipe(id_recipe, id_user);
@@ -117,7 +129,7 @@ const deleteLikedRecipe = async (req, res) => {
 }
 
 module.exports = {
-    getLikedRecipe,
+    getAllLikedRecipe,
     getDetailLikedRecipe,
     createLikedRecipe,
     deleteLikedRecipe

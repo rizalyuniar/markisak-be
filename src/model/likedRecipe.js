@@ -5,9 +5,10 @@ const selectLikedRecipe = (id_recipe, sortBy, sort, limit, offset) => {
         ORDER BY ${sortBy} ${sort} LIMIT ${limit} OFFSET ${offset}`);
 }
 
-const selectDetailLikedRecipe = (id_recipe, id_liked_recipe) => {
-    return pool.query(`SELECT * FROM liked_recipes WHERE id_recipe='${id_recipe}' 
-        AND id='${id_liked_recipe}'`);
+const selectDetailLikedRecipe = (id) => {
+    return new Promise((resolve, reject) =>
+        pool.query(`SELECT * FROM liked_recipes WHERE id='${id}'`,
+            (error, result) => !error ? resolve(result) : reject(error)));
 }
 
 const insertLikedRecipe = (data) => {
@@ -21,13 +22,7 @@ const deleteLikedRecipe = (id_recipe, id_user) => {
         AND id_user='${id_user}'`);
 }
 
-const findId = (id) => {
-    return new Promise((resolve, reject) =>
-        pool.query(`SELECT id FROM liked_recipes WHERE id='${id}'`,
-            (error, result) => !error ? resolve(result) : reject(error)));
-}
-
-const findUserLikedRecipe = (id_recipe, id_user) => {
+const selectUserLikedRecipe = (id_recipe, id_user) => {
     return new Promise((resolve, reject) =>
         pool.query(`SELECT id_user FROM liked_recipes 
             WHERE id_recipe='${id_recipe}' AND id_user='${id_user}'`, 
@@ -45,7 +40,6 @@ module.exports = {
     selectDetailLikedRecipe,
     insertLikedRecipe,
     deleteLikedRecipe,
-    findId,
-    findUserLikedRecipe,
+    selectUserLikedRecipe,
     countData
 }

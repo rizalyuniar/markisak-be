@@ -31,7 +31,7 @@ function insertUser(queryObject) {
         queryObject;
     return pool.query(
         `INSERT INTO users(id, name, email, phone_number, password, photo) ` +
-            `VALUES('${queryId}', '${name}', '${email}', ${phone_number}, '${queryPwd}', '${queryFilename}')`
+            `VALUES('${queryId}', '${name}', '${email}', '${phone_number}', '${queryPwd}', '${queryFilename}')`
     );
 }
 
