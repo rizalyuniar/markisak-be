@@ -123,12 +123,18 @@ const updateRecipe = async (req, res) => {
             return commonHelper.response(res, null, 403,
                 "Updating recipe created by other user is not allowed");
 
-        //Get recipe photo
-        if (req.file == undefined) return commonHelper
-            .response(res, null, 400, "Please input photo");
-        const HOST = process.env.RAILWAY_STATIC_URL;
-        data.photo = `http://${HOST}/img/${req.file.filename}`;
 
+        try{
+            const HOST = process.env.RAILWAY_STATIC_URL;
+            data.photo = `http://${HOST}/img/${req.file.filename}`;
+        }
+        catch(err){
+            data.photo = recipeResult.rows[0].photo
+        }
+        //Get recipe photo
+        // if (req.file == undefined) return commonHelper
+        //     .response(res, null, 400, "Please input photo");
+    
         //Update recipe in database
         data.id = id;
         data.updated_at = Date.now();
