@@ -15,7 +15,7 @@ const commonHelper = require("./src/helper/common");
 // Use middleware
 app.use(express.json());
 app.use(cors({
-    origin: "https://markisak-fe.vercel.app/"
+    origin: "*"
 }));
 app.use(morgan("dev"));
 app.use(helmet());
