@@ -212,7 +212,6 @@ const updateUser = async (req, res) => {
         } else {
             return commonHelper.response(res, null, 404, "No matching id");
         }
-        console.log("henlo");
     } catch (err) {
         console.log(err);
         return commonHelper.response(res, null, 500, "Update failed");
