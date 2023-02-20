@@ -14,6 +14,12 @@ const selectRecipe = (id) => {
             (error, result) => (!error) ? resolve(result) : reject(error)));
 }
 
+const selectRecipeTitle = (title) => {
+    return new Promise((resolve, reject) =>
+        pool.query(`select * from recipes where title ilike '%${title}%'`,
+            (error, result) => (!error) ? resolve(result) : reject(error)));
+}
+
 
 const insertRecipe = (data) => {
     const { id, id_user, title, photo, ingredients, created_at, updated_at,
@@ -43,6 +49,7 @@ const countData = () => {
 module.exports = {
     selectAllRecipes,
     selectRecipe,
+    selectRecipeTitle,
     insertRecipe,
     updateRecipe,
     deleteRecipe,

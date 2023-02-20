@@ -72,9 +72,15 @@ const getDetailRecipe = async (req, res) => {
 
 const createRecipe = async (req, res) => {
     try {
-        //Get request recipe data
+        //Get request recipe data and recipe title
         const data = req.body;
+        const title = data.title;
 
+        //Check if recipe title already exists
+        const recipeTitleResult = recipeModel.selectRecipeTitle(title);
+        if (!recipeTitleResult.rows) return commonHelper
+            .response(res, null, 403, "Recipe title already exists");
+        
         //Get recipe photo
         if (req.file == undefined) return commonHelper
             .response(res, null, 400, "Please input photo");
