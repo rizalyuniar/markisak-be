@@ -39,11 +39,11 @@ const isIdValid = (req, res, next) => {
                 res,
                 null,
                 403,
-                "Your ID did not match parameter"
+                "Unauthorized, please login with a different account"
             );
         }
     } else {
-        commonHelper.response(res, null, 403, "ID not found");
+        commonHelper.response(res, null, 403, "User not found");
     }
 };
 

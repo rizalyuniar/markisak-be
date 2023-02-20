@@ -113,6 +113,9 @@ const registerUser = (req, res) => {
     const salt = bcrypt.genSaltSync(10);
     req.body.queryPwd = bcrypt.hashSync(req.body.password, salt);
 
+    //Convert email to lowercase
+    req.body.email = req.body.email.toLowerCase();
+
     // Calling insert from model
     userModel
         .insertUser(req.body)
@@ -220,7 +223,7 @@ const deleteUser = async (req, res) => {
                     "User deletion success"
                 );
             } else {
-                return commonHelper.response(res, null, 404, "Id not found");
+                return commonHelper.response(res, null, 404, "User not found");
             }
         })
         .catch((err) => {
@@ -242,7 +245,7 @@ const loginUser = async (req, res) => {
         const user = result.rows[0];
 
         if (!user) {
-            return commonHelper.response(res, null, 400, "Email is invalid");
+            return commonHelper.response(res, null, 400, "Email not found");
         }
         const isValidPassword = bcrypt.compareSync(
             data.password,
@@ -251,7 +254,7 @@ const loginUser = async (req, res) => {
         delete user.password;
         console.log(isValidPassword);
         if (!isValidPassword) {
-            return commonHelper.response(res, null, 400, "Password is invalid");
+            return commonHelper.response(res, null, 400, "Wrong password");
         }
 
         const payload = {

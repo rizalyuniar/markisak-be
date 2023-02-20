@@ -6,7 +6,6 @@ const mainRouter = require("./src/router/index"); // Import main router
 const express = require("express"); // Import express library
 const helmet = require("helmet"); // Import helmet
 const cors = require("cors"); // Import cors
-const createError = require("http-errors"); // Import http error
 const morgan = require("morgan"); // Import morgan
 const xss = require("xss-clean"); // Import xss
 const app = express(); // Import express
