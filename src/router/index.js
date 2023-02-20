@@ -10,7 +10,6 @@ const savedRecipeRouter = require("./savedRecipe");
 const userRouter = require("./user");
 
 // Use route
-router.use("/v1/admin", adminRouter);
 router.use("/v1/recipe", recipeRouter);
 router.use("/v1/liked-recipe", likedRecipeRouter);
 router.use("/v1/saved-recipe", savedRecipeRouter);
