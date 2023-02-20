@@ -30,6 +30,7 @@ This backend API is created by 3 team members, where each member have different 
 - Admin CRUD
 - Chats CRUD
 - Testing
+- Recipe dummy data
 
 ## Documentation
 Documentation files are provided in the [docs] folder
