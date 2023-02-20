@@ -85,7 +85,6 @@ const getDetailUser = async (req, res) => {
         const likes = await userModel.selectAllLikes(queryId);
         const saved = await userModel.selectAllSaved(queryId);
         const recipes = await userModel.selectUserRecipes(queryId);
-        console.log(result.rowCount);
         result.rows[0].likes = likes.rows;
         result.rows[0].saved = saved.rows;
         result.rows[0].recipes = recipes.rows;
@@ -277,7 +276,6 @@ const loginUser = async (req, res) => {
             user.password
         );
         delete user.password;
-        console.log(isValidPassword);
         if (!isValidPassword) {
             return commonHelper.response(res, null, 400, "Wrong password");
         }
