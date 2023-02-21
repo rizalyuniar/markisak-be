@@ -6,7 +6,7 @@ const SCOPES = [
   'https://www.googleapis.com/auth/drive',
   'https://www.googleapis.com/auth/drive.appdata',
   'https://www.googleapis.com/auth/drive.file',
-  ' https://www.googleapis.com/auth/drive.scripts',
+  'https://www.googleapis.com/auth/drive.scripts',
   'https://www.googleapis.com/auth/drive.metadata',
 ];
 
@@ -26,18 +26,21 @@ const auth = new google.auth.GoogleAuth({
   scopes: SCOPES,
 });
 
+// Hit google api
 const driveService = google.drive({
   version: 'v3',
   auth: auth,
 });
 
-async function uploadFile(auth, photo) {
-  // Edit File meta data
+// Parameter file
+async function uploadPhoto(photo) {
+  // Edit File meta data yang ada di drive
   const fileMetaData = {
     name: photo.filename,
-    parents: ['1ySvzVte_BhCmGBTQy5Q1kiyrlk-dUwT1'],
+    parents: [process.env.GOOGLE_DRIVE_PARENT_FOLDER],
   };
 
+  // File yang akan di upload
   const media = {
     mimeType: 'image/jpg',
     body: fs.createReadStream(photo.path),
@@ -52,9 +55,10 @@ async function uploadFile(auth, photo) {
   return response.data;
 }
 
-async function deletePhoto(auth, photo) {
+// Parameternya id
+async function deletePhoto(photoId) {
   // ID File photo di google drive
-  const id = '1GlED7lKkzuJKwalL7RRjQKYUxvWcTG0J';
+  const id = photoId;
   const response = await driveService.files.delete({
     fileId: id,
   });
@@ -62,14 +66,17 @@ async function deletePhoto(auth, photo) {
   return response.data;
 }
 
-async function updatePhoto(auth) {
+// Parameternya file dan Id photo yang lama
+async function updatePhoto(photo, oldPhotoId) {
+    // File yang akan di upload
   const media = {
-    mimeType: 'image/jpg',
-    body: fs.createReadStream('bg-food.jpg'),
+    mimeType: photo.mimeType,
+    body: fs.createReadStream(photo.path),
   };
 
+  // File yang akan di replace
   const response = await driveService.files.update({
-    fileId: '1y0ueYdm6j9KLhq51c0qnao1zchuyDsRc',
+    fileId: oldPhotoId,
     media: media,
     fields: 'id',
   });
@@ -77,9 +84,15 @@ async function updatePhoto(auth) {
   return response.data;
 }
 
-updatePhoto(auth)
-  .then((res) => console.log(res))
-  .catch((err) => console.log(err));
+module.exports = {
+  updatePhoto,
+  deletePhoto,
+  uploadPhoto
+}
+
+// updatePhoto(auth)
+//   .then((res) => console.log(res))
+//   .catch((err) => console.log(err));
 
 // deletePhoto(auth)
 //   .then((res) => console.log(res))
