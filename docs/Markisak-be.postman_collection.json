@@ -1,0 +1,1209 @@
+{
+	"info": {
+		"_postman_id": "07e03924-da54-45e0-a69e-328cb0d4430b",
+		"name": "Markisak",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Get params",
+					"item": [
+						{
+							"name": "Search user",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{api_url}}/v1/user?search=user",
+									"host": [
+										"{{api_url}}"
+									],
+									"path": [
+										"v1",
+										"user"
+									],
+									"query": [
+										{
+											"key": "search",
+											"value": "user"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Sort by name",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{api_url}}/v1/user?sortBy=name&sort=desc",
+									"host": [
+										"{{api_url}}"
+									],
+									"path": [
+										"v1",
+										"user"
+									],
+									"query": [
+										{
+											"key": "sortBy",
+											"value": "name"
+										},
+										{
+											"key": "sort",
+											"value": "desc"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Pagination test",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{api_url}}/v1/user?page=2&limit=10",
+									"host": [
+										"{{api_url}}"
+									],
+									"path": [
+										"v1",
+										"user"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "2"
+										},
+										{
+											"key": "limit",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Get all users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/v1/user?limit=40",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"user"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "40"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Nama anda disini",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "email@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "phone_number",
+									"value": "081275846934",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "password123",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{api_url}}/v1/user/register",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"user",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Email Verification",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{fe_url}}/v1/user/verif/{{verify_token}}",
+							"host": [
+								"{{fe_url}}"
+							],
+							"path": [
+								"v1",
+								"user",
+								"verif",
+								"{{verify_token}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"email@gmail.com\",\n    \"password\": \"password\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/v1/user/login",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refreshToken\":\"eyJhbGceswJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFsaWYuYW5rZS5iaW1hQGdtYWlsfeasdSIsImlkIjoiOTU5OWNmM2QtYWJhMy00NmE1LTk2ZjAtMWQ5ZDkzYTE1ZDA4IiwiaWF0IjoxNjc2ODYzMzcyLCJleHAiOjE2NzedwDk3NzJ9.-E0yU876dDVQArmLw1o0h_2V_APbyywB5dqyy1BydRY\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/v1/user/refresh-token",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"user",
+								"refresh-token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get detail user",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/v1/user/{{id_user}}",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"user",
+								"{{id_user}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update user",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Nama anda disini",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "email@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "phone_number",
+									"value": "081275846934",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "photo",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{api_url}}/v1/user/{{id_user}}",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"user",
+								"{{id_user}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete user",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/v1/user/{{id_user}}",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"user",
+								"{{id_user}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Recipe",
+			"item": [
+				{
+					"name": "Get params",
+					"item": [
+						{
+							"name": "Search recipe",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{api_url}}/v1/recipe?search=recipe",
+									"host": [
+										"{{api_url}}"
+									],
+									"path": [
+										"v1",
+										"recipe"
+									],
+									"query": [
+										{
+											"key": "search",
+											"value": "recipe"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Sort by like count",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{api_url}}/v1/recipe?sortBy=like_count&sort=desc",
+									"host": [
+										"{{api_url}}"
+									],
+									"path": [
+										"v1",
+										"recipe"
+									],
+									"query": [
+										{
+											"key": "sortBy",
+											"value": "like_count"
+										},
+										{
+											"key": "sort",
+											"value": "desc"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Sort by last updated",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{api_url}}/v1/recipe?sortBy=updated_at&sort=desc",
+									"host": [
+										"{{api_url}}"
+									],
+									"path": [
+										"v1",
+										"recipe"
+									],
+									"query": [
+										{
+											"key": "sortBy",
+											"value": "updated_at"
+										},
+										{
+											"key": "sort",
+											"value": "desc"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Pagination test",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{api_url}}/v1/recipe?page=4&limit=4",
+									"host": [
+										"{{api_url}}"
+									],
+									"path": [
+										"v1",
+										"recipe"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "4"
+										},
+										{
+											"key": "limit",
+											"value": "4"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Get all recipes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/v1/recipe",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"recipe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get recipe by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/v1/recipe/{{id_recipe}}",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"recipe",
+								"{{id_recipe}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create recipe",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Recipe here",
+									"type": "default"
+								},
+								{
+									"key": "ingredients",
+									"value": "Ingredients list",
+									"type": "text"
+								},
+								{
+									"key": "photo",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "description",
+									"value": "Recipe description",
+									"type": "default"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/v1/recipe",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"recipe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update recipe",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Recipe here",
+									"type": "text"
+								},
+								{
+									"key": "ingredients",
+									"value": "Ingredients list",
+									"type": "text"
+								},
+								{
+									"key": "photo",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "description",
+									"value": "Recipe description",
+									"type": "default"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/v1/recipe/{{id_recipe}}",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"recipe",
+								"{{id_recipe}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete recipe",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\":\"tes resep 69420\",\n    \"photo\":\"gambar.jpg\",\n    \"ingredients\":\"ini adalah cara caranya caranya caranya\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/v1/recipe/{{id_recipe}}",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"recipe",
+								"{{id_recipe}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Video",
+			"item": [
+				{
+					"name": "Get recipe videos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/v1/recipe/{{id_recipe}}/video",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"recipe",
+								"{{id_recipe}}",
+								"video"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get detail video",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/v1/recipe/{{id_recipe}}/video/{{id_video}}",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"recipe",
+								"{{id_recipe}}",
+								"video",
+								"{{id_video}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add video",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"step\" : 1,\n    \"url_video\" : \"youtube.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/v1/recipe/{{id_recipe}}/video",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"recipe",
+								"{{id_recipe}}",
+								"video"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update video",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"step\" : 1,\n    \"url_video\" : \"youtube.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/v1/recipe/{{id_recipe}}/video/{{id_video}}",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"recipe",
+								"{{id_recipe}}",
+								"video",
+								"{{id_video}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete video",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/v1/recipe/{{id_recipe}}/video/{{id_video}}",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"recipe",
+								"{{id_recipe}}",
+								"video",
+								"{{id_video}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Comment",
+			"item": [
+				{
+					"name": "Get params",
+					"item": [
+						{
+							"name": "Sort by oldest",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{api_url}}/v1/recipe/{{id_recipe}}/comment?sortBy=created_at",
+									"host": [
+										"{{api_url}}"
+									],
+									"path": [
+										"v1",
+										"recipe",
+										"{{id_recipe}}",
+										"comment"
+									],
+									"query": [
+										{
+											"key": "sortBy",
+											"value": "created_at"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Pagination test",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{api_url}}/v1/recipe/{{id_recipe}}/comment?page=2&limit=2",
+									"host": [
+										"{{api_url}}"
+									],
+									"path": [
+										"v1",
+										"recipe",
+										"{{id_recipe}}",
+										"comment"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "2"
+										},
+										{
+											"key": "limit",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Get recipe comments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/v1/recipe/{{id_recipe}}/comment",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"recipe",
+								"{{id_recipe}}",
+								"comment"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get detail comment",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/v1/recipe/{{id_recipe}}/comment/{{id_comment}}",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"recipe",
+								"{{id_recipe}}",
+								"comment",
+								"{{id_comment}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create comment",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"message\": \"This is a comment\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/v1/recipe/{{id_recipe}}/comment",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"recipe",
+								"{{id_recipe}}",
+								"comment"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update comment",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"message\": \"This is a comment\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/v1/recipe/{{id_recipe}}/comment/{{id_comment}}",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"recipe",
+								"{{id_recipe}}",
+								"comment",
+								"{{id_comment}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete comment",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/v1/recipe/{{id_recipe}}/comment/{{id_comment}}",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"recipe",
+								"{{id_recipe}}",
+								"comment",
+								"{{id_comment}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Liked recipe",
+			"item": [
+				{
+					"name": "Get user liked recipes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/v1/liked-recipe/user",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"liked-recipe",
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all liked recipe",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/v1/recipe/{{id_recipe}}/liked-recipe",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"recipe",
+								"{{id_recipe}}",
+								"liked-recipe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get detail liked recipe",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/v1/recipe/{{id_recipe}}/liked-recipe/{{id_liked_recipe}}",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"recipe",
+								"{{id_recipe}}",
+								"liked-recipe",
+								"{{id_liked_recipe}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create liked recipe",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/v1/recipe/8087f49b-ad1a-4409-b513-dd5f7e156ae9/liked-recipe",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"recipe",
+								"8087f49b-ad1a-4409-b513-dd5f7e156ae9",
+								"liked-recipe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete like recipe",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/v1/recipe/{{id_recipe}}/liked-recipe",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"recipe",
+								"{{id_recipe}}",
+								"liked-recipe"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Saved recipe",
+			"item": [
+				{
+					"name": "Get user saved recipes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/v1/saved-recipe/user",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"saved-recipe",
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all saved recipe",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/v1/recipe/{{id_recipe}}/saved-recipe",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"recipe",
+								"{{id_recipe}}",
+								"saved-recipe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get detail saved recipe",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/v1/recipe/{{id_recipe}}/saved-recipe/{{id_saved_recipe}}",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"recipe",
+								"{{id_recipe}}",
+								"saved-recipe",
+								"{{id_saved_recipe}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create saved recipe",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/v1/recipe/{{id_recipe}}/saved-recipe",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"recipe",
+								"{{id_recipe}}",
+								"saved-recipe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete saved recipe",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/v1/recipe/{{id_recipe}}/saved-recipe",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"v1",
+								"recipe",
+								"{{id_recipe}}",
+								"saved-recipe"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "api_url",
+			"value": "https://markisak-be-production.up.railway.app"
+		},
+		{
+			"key": "fe_url",
+			"value": "localhost:4000",
+			"type": "default"
+		},
+		{
+			"key": "verify_token",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "id_user",
+			"value": "9599cf3d-aba3-46a5-96f0-1d9d93a15d08"
+		},
+		{
+			"key": "token",
+			"value": ""
+		},
+		{
+			"key": "id_recipe",
+			"value": "7f75b339-29bd-431b-a061-957108148abc",
+			"type": "default"
+		},
+		{
+			"key": "id_video",
+			"value": "8aa4fc6a-040c-4763-8170-27db178393b3"
+		},
+		{
+			"key": "id_comment",
+			"value": "b2588495-6efb-4662-8667-e28fcdfc2000"
+		},
+		{
+			"key": "id_liked_recipe",
+			"value": "d548d744-354e-43e6-97f7-5c5e5c440df6"
+		},
+		{
+			"key": "id_saved_recipe",
+			"value": "1518ff64-c0c7-4a1f-a715-8f53ae5e8735",
+			"type": "default"
+		}
+	]
+}
