@@ -37,14 +37,12 @@ router.delete('/:id_recipe/comment/:id_comment', authMiddleware.protect, comment
 //Liked recipe router
 router.get('/:id_recipe/liked-recipe', likedRecipeController.getAllLikedRecipe);
 router.get('/:id_recipe/liked-recipe/:id_liked_recipe', likedRecipeController.getDetailLikedRecipe);
-router.post('/:id_recipe/liked-recipe', authMiddleware.protect, likedRecipeController.createLikedRecipe);
-router.delete('/:id_recipe/liked-recipe', authMiddleware.protect, likedRecipeController.deleteLikedRecipe);
+router.post('/:id_recipe/liked-recipe', authMiddleware.protect, likedRecipeController.toggleLikedRecipe);
 
-// Saved recipe router
+//Saved recipe router
 router.get('/:id_recipe/saved-recipe', savedRecipeController.getAllSavedRecipe);
 router.get('/:id_recipe/saved-recipe/:id_saved_recipe', savedRecipeController.getDetailSavedRecipe);
-router.post('/:id_recipe/saved-recipe', authMiddleware.protect, savedRecipeController.createSavedRecipe);
-router.delete('/:id_recipe/saved-recipe', authMiddleware.protect, savedRecipeController.deleteSavedRecipe);
+router.post('/:id_recipe/saved-recipe', authMiddleware.protect, savedRecipeController.toggleSavedRecipe);
 
-// Export router to index.js at router folder
+//Export router to index.js at router folder
 module.exports = router;

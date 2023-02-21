@@ -69,69 +69,6 @@ const getDetailSavedRecipe = async (req, res) => {
     }
 }
 
-const createSavedRecipe = async (req, res) => {
-    try {
-        //Get request recipe id and user id
-        const id_recipe = req.params.id_recipe;
-        const id_user = req.payload.id;
-
-        //Check if recipe exists in db
-        const recipeResults = await modelRecipe.selectRecipe(id_recipe);
-        if (!recipeResults.rowCount) return commonHelper
-            .response(res, null, 404, "Recipe not found");
-        
-        //Check if user already saved recipe
-        const selectUserSavedRecipe = await modelSavedRecipe
-            .selectUserSavedRecipe(id_recipe, id_user)
-        if (selectUserSavedRecipe.rowCount) return commonHelper
-            .response(res, null, 403, "User already saved recipe");
-
-        //Saved recipe metadata
-        const data = {};
-        data.id = uuidv4();
-        data.id_user = id_user;
-        data.id_recipe = id_recipe;
-        data.created_at = Date.now();
-
-        //Insert saved recipe
-        const results = await modelSavedRecipe.insertSavedRecipe(data);
-
-        //Response
-        commonHelper.response(res, results.rows, 201, "User saved recipe");
-    } catch (error) {
-        console.log(error);
-        commonHelper.response(res, null, 500, "Failed user liking recipe");
-    }
-}
-
-const deleteSavedRecipe = async (req, res) => {
-    try {
-        //Get request recipe id and user id
-        const id_recipe = req.params.id_recipe;
-        const id_user = req.payload.id;
-        
-        //Check if recipe exists in db
-        const recipeResults = await modelRecipe.selectRecipe(id_recipe);
-        if (!recipeResults.rowCount) return commonHelper
-            .response(res, null, 404, "Recipe not found");
-
-        //Check if user haven't saved recipe
-        const selectUserSavedRecipe = await modelSavedRecipe
-            .selectUserSavedRecipe(id_recipe, id_user)
-        if (!selectUserSavedRecipe.rowCount) return commonHelper
-            .response(res, null, 404, "User haven't saved recipe");
-
-        //Delete saved recipe
-        const results = await modelSavedRecipe.deleteSavedRecipe(id_recipe, id_user);
-
-        //Response
-        commonHelper.response(res, results.rows, 200, "User unsaved recipe");
-    } catch (error) {
-        console.log(error);
-        commonHelper.response(res, null, 500, "Failed user disliking recipe");
-    }
-}
-
 const getUserSavedRecipes = async (req, res) => {
     try {
         //Get request user id
@@ -151,10 +88,48 @@ const getUserSavedRecipes = async (req, res) => {
     }
 }
 
+const toggleSavedRecipe = async (req, res) => {
+    try {
+        //Get request recipe id and user id
+        const id_recipe = req.params.id_recipe;
+        const id_user = req.payload.id;
+
+        //Check if recipe exists in db
+        const recipeResults = await modelRecipe.selectRecipe(id_recipe);
+        if (!recipeResults.rowCount) return commonHelper
+            .response(res, null, 404, "Recipe not found");
+        
+        //Check save recipe status
+        const userSavedRecipeResult = await modelSavedRecipe
+            .selectUserSavedRecipe(id_recipe, id_user);
+        const userSavedStatus = userSavedRecipeResult.rowCount;
+        
+        //Toggle between create save and delete save
+        //Based on user saved recipe status
+        if(userSavedStatus) {
+            const results = await modelSavedRecipe
+                .deleteSavedRecipe(id_recipe, id_user);
+            commonHelper.response(res, results.rows, 200, "User unsaved recipe");
+        } else {
+            const data = {};
+            data.id = uuidv4();
+            data.id_user = id_user;
+            data.id_recipe = id_recipe;
+            data.created_at = Date.now();
+            const results = await modelSavedRecipe
+                .insertSavedRecipe(data);
+            commonHelper.response(res, results.rows, 201, "User saved recipe");
+        }
+    } catch (error) {
+        console.log(error);
+        commonHelper.response(res, null, 500, "Failed user liking recipe");
+    }
+}
+
+
 module.exports = {
     getAllSavedRecipe,
     getDetailSavedRecipe,
-    createSavedRecipe,
-    deleteSavedRecipe,
-    getUserSavedRecipes
+    getUserSavedRecipes,
+    toggleSavedRecipe,
 }
