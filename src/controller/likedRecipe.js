@@ -69,69 +69,6 @@ const getDetailLikedRecipe = async (req, res) => {
     }
 }
 
-const createLikedRecipe = async (req, res) => {
-    try {
-        //Get request recipe id and user id
-        const id_recipe = req.params.id_recipe;
-        const id_user = req.payload.id;
-
-        //Check if recipe exists in db
-        const recipeResults = await modelRecipe.selectRecipe(id_recipe);
-        if (!recipeResults.rowCount) return commonHelper
-            .response(res, null, 404, "Recipe not found");
-        
-        //Check if user already liked recipe
-        const selectUserLikedRecipe = await modelLikedRecipe
-            .selectUserLikedRecipe(id_recipe, id_user)
-        if (selectUserLikedRecipe.rowCount) return commonHelper
-            .response(res, null, 403, "User already liked recipe");
-
-        //Liked recipe metadata
-        const data = {};
-        data.id = uuidv4();
-        data.id_user = id_user;
-        data.id_recipe = id_recipe;
-        data.created_at = Date.now();
-
-        //Insert liked recipe
-        const results = await modelLikedRecipe.insertLikedRecipe(data);
-
-        //Response
-        commonHelper.response(res, results.rows, 201, "User liked recipe");
-    } catch (error) {
-        console.log(error);
-        commonHelper.response(res, null, 500, "Failed user liking recipe");
-    }
-}
-
-const deleteLikedRecipe = async (req, res) => {
-    try {
-        //Get request recipe id and user id
-        const id_recipe = req.params.id_recipe;
-        const id_user = req.payload.id;
-        
-        //Check if recipe exists in db
-        const recipeResults = await modelRecipe.selectRecipe(id_recipe);
-        if (!recipeResults.rowCount) return commonHelper
-            .response(res, null, 404, "Recipe not found");
-
-        //Check if user haven't liked recipe
-        const selectUserLikedRecipe = await modelLikedRecipe
-            .selectUserLikedRecipe(id_recipe, id_user)
-        if (!selectUserLikedRecipe.rowCount) return commonHelper
-            .response(res, null, 404, "User haven't liked recipe");
-
-        //Delete liked recipe
-        const results = await modelLikedRecipe.deleteLikedRecipe(id_recipe, id_user);
-
-        //Response
-        commonHelper.response(res, results.rows, 200, "User disliked recipe");
-    } catch (error) {
-        console.log(error);
-        commonHelper.response(res, null, 500, "Failed user disliking recipe");
-    }
-}
-
 const getUserLikedRecipes = async (req, res) => {
     try {
         //Get request user id
@@ -151,10 +88,47 @@ const getUserLikedRecipes = async (req, res) => {
     }
 }
 
+const toggleLikedRecipe = async (req, res) => {
+    try {
+        //Get request recipe id and user id
+        const id_recipe = req.params.id_recipe;
+        const id_user = req.payload.id;
+
+        //Check if recipe exists in db
+        const recipeResults = await modelRecipe.selectRecipe(id_recipe);
+        if (!recipeResults.rowCount) return commonHelper
+            .response(res, null, 404, "Recipe not found");
+        
+        //Check like recipe status
+        const userLikedRecipeResult = await modelLikedRecipe
+            .selectUserLikedRecipe(id_recipe, id_user);
+        const userLikedStatus = userLikedRecipeResult.rowCount;
+        
+        //Toggle between create like and delete like
+        //Based on user liked recipe status
+        if(userLikedStatus) {
+            const results = await modelLikedRecipe
+                .deleteLikedRecipe(id_recipe, id_user);
+            commonHelper.response(res, results.rows, 200, "User disliked recipe");
+        } else {
+            const data = {};
+            data.id = uuidv4();
+            data.id_user = id_user;
+            data.id_recipe = id_recipe;
+            data.created_at = Date.now();
+            const results = await modelLikedRecipe
+                .insertLikedRecipe(data);
+            commonHelper.response(res, results.rows, 201, "User liked recipe");
+        }
+    } catch (error) {
+        console.log(error);
+        commonHelper.response(res, null, 500, "Failed user liking recipe");
+    }
+}
+
 module.exports = {
     getAllLikedRecipe,
     getDetailLikedRecipe,
-    createLikedRecipe,
-    deleteLikedRecipe,
-    getUserLikedRecipes
+    getUserLikedRecipes,
+    toggleLikedRecipe
 }

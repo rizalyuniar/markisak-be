@@ -3,7 +3,6 @@ const express = require("express");
 const router = express.Router();
 
 // Import route
-const adminRouter = require("./admin");
 const recipeRouter = require("./recipe");
 const likedRecipeRouter = require("./likedRecipe");
 const savedRecipeRouter = require("./savedRecipe");
