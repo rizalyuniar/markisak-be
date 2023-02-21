@@ -3,3 +3,4 @@ node_modules
 .vscode
 src/upload/*
 !src/upload/init.txt
+/credentials.json
