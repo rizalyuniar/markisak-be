@@ -5,7 +5,7 @@ const createError = require("http-errors");
 const storage = multer.diskStorage({
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-        const type = file.mimetype.replaceAll("/",".")
+        let type = file.mimetype.split("/")[1]
         cb(
             null,
             file.fieldname + "-" + uniqueSuffix + "." + type.toLowerCase()

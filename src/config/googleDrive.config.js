@@ -1,6 +1,5 @@
 const { google } = require('googleapis');
 const fs = require('fs');
-require('dotenv').config({ path: __dirname + '../../../.env' })
 
 const SCOPES = [
   'https://www.googleapis.com/auth/drive',
@@ -42,7 +41,7 @@ async function uploadPhoto(photo) {
 
   // File yang akan di upload
   const media = {
-    mimeType: 'image/jpg',
+    mimeType: photo.mimeType,
     body: fs.createReadStream(photo.path),
   };
 

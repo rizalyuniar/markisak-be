@@ -203,6 +203,7 @@ const updateUser = async (req, res) => {
                     const oldPhoto = result.rows[0].photo;
                     const oldPhotoId = oldPhoto.split("=")[1];
                     const updateResult = await updatePhoto(req.file, oldPhotoId);
+                    console.log(updateResult);
                     const parentPath = process.env.GOOGLE_DRIVE_PHOTO_PATH;
                     req.body.queryFilename = parentPath.concat(updateResult.id);
                 }
@@ -210,8 +211,6 @@ const updateUser = async (req, res) => {
                 console.log(err)
                 req.body.queryFilename = result.rows[0].photo;
             }
-
-            console.log(req.body.queryFilename);
             userModel
                 .updateUser(req.body)
                 .then((rslt) => {
