@@ -31,7 +31,7 @@ const getAllRecipes = async (req, res) => {
         const pagination = { currentPage: page, limit, totalData, totalPage };
 
         //Return if page params more than total page
-        if(page > totalPage) return commonHelper
+        if (page > totalPage) return commonHelper
             .response(res, null, 404, "Page invalid", pagination);
 
         //Response
@@ -84,7 +84,7 @@ const createRecipe = async (req, res) => {
         const recipeTitleResult = await recipeModel.selectRecipeTitle(title);
         if (recipeTitleResult.rowCount > 0) return commonHelper
             .response(res, null, 403, "Recipe title already exists");
-        
+
         //Get recipe photo
         if (req.file == undefined) return commonHelper
             .response(res, null, 400, "Please input photo");
@@ -99,7 +99,7 @@ const createRecipe = async (req, res) => {
         const result = await recipeModel.insertRecipe(data);
 
         //Response
-        commonHelper.response(res, [{id:data.id}], 201, "Recipe added");
+        commonHelper.response(res, [{ id: data.id }], 201, "Recipe added");
     } catch (error) {
         console.log(error);
         commonHelper.response(res, null, 500, "Failed adding recipe");
@@ -124,24 +124,24 @@ const updateRecipe = async (req, res) => {
                 "Updating recipe created by other user is not allowed");
 
 
-        try{
+        try {
             const HOST = process.env.RAILWAY_STATIC_URL;
             data.photo = `http://${HOST}/img/${req.file.filename}`;
         }
-        catch(err){
+        catch (err) {
             data.photo = recipeResult.rows[0].photo
         }
         //Get recipe photo
         // if (req.file == undefined) return commonHelper
         //     .response(res, null, 400, "Please input photo");
-    
+
         //Update recipe in database
         data.id = id;
         data.updated_at = Date.now();
         const result = await recipeModel.updateRecipe(data);
 
         //Response
-        commonHelper.response(res, [{id:data.id}], 201, "Recipe updated");
+        commonHelper.response(res, [{ id: data.id }], 201, "Recipe updated");
     } catch (error) {
         console.log(error);
         commonHelper.response(res, null, 500, "Failed updating recipe");
