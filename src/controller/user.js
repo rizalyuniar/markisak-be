@@ -16,6 +16,7 @@ const commonHelper = require("../helper/common");
 // Import Helper for authentication
 const authHelper = require("../helper/auth");
 const { sendMail } = require("../config/mail");
+const { updatePhoto, uploadPhoto, deletePhoto } = require("../config/googleDrive.config");
 
 // Function to get all or search from databas
 const getAllUsers = async (req, res) => {
@@ -190,12 +191,27 @@ const updateUser = async (req, res) => {
             }
 
             try {
-                req.body.queryFilename = `http://${HOST}/img/${req.file.filename}`;
-                // Add photo removal function here
+                console.log(req.file.filename);
+                if (
+                    result.rows[0].photo == "photo.jpg" ||
+                    result.rows[0].photo == "undefined"
+                ) {
+                    const uploadResult = await uploadPhoto(req.file);
+                    const parentPath = process.env.GOOGLE_DRIVE_PHOTO_PATH;
+                    req.body.queryFilename = parentPath.concat(uploadResult.id);
+                } else {
+                    const oldPhoto = result.rows[0].photo;
+                    const oldPhotoId = oldPhoto.split("=")[1];
+                    const updateResult = await updatePhoto(req.file, oldPhotoId);
+                    const parentPath = process.env.GOOGLE_DRIVE_PHOTO_PATH;
+                    req.body.queryFilename = parentPath.concat(updateResult.id);
+                }
             } catch (err) {
+                console.log(err)
                 req.body.queryFilename = result.rows[0].photo;
             }
 
+            console.log(req.body.queryFilename);
             userModel
                 .updateUser(req.body)
                 .then((rslt) => {
