@@ -1,4 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
+const { uploadPhoto, updatePhoto, deletePhoto } = require('../config/googleDrive.config.js');
 
 const commonHelper = require('../helper/common.js');
 const commentModel = require('../model/comment.js');
@@ -88,8 +89,11 @@ const createRecipe = async (req, res) => {
         //Get recipe photo
         if (req.file == undefined) return commonHelper
             .response(res, null, 400, "Please input photo");
-        const HOST = process.env.RAILWAY_STATIC_URL;
-        data.photo = `http://${HOST}/img/${req.file.filename}`;
+        // const HOST = process.env.RAILWAY_STATIC_URL;
+        // data.photo = `http://${HOST}/img/${req.file.filename}`;
+        const uploadResult = await uploadPhoto(req.file)
+        const parentPath = process.env.GOOGLE_DRIVE_PHOTO_PATH;
+        data.photo = parentPath.concat(uploadResult.id)
 
         //Insert recipe to database
         data.id = uuidv4();
@@ -125,8 +129,11 @@ const updateRecipe = async (req, res) => {
 
 
         try {
-            const HOST = process.env.RAILWAY_STATIC_URL;
-            data.photo = `http://${HOST}/img/${req.file.filename}`;
+            const oldPhoto = recipeResult.rows[0].photo;
+            const oldPhotoId = oldPhoto.split("=")[1];
+            const updateResult = await updatePhoto(req.file, oldPhotoId)
+            const parentPath = process.env.GOOGLE_DRIVE_PHOTO_PATH;
+            data.photo = parentPath.concat(updateResult.id)
         }
         catch (err) {
             data.photo = recipeResult.rows[0].photo
@@ -165,8 +172,13 @@ const deleteRecipe = async (req, res) => {
             return commonHelper.response(res, null, 403,
                 "Deleting recipe created by other user is not allowed");
 
+        
         //Delete recipe
         const result = await recipeModel.deleteRecipe(id);
+
+        const oldPhoto = recipeResult.rows[0].photo;
+        const oldPhotoId = oldPhoto.split("=")[1];
+        await deletePhoto(oldPhotoId)
 
         //Response
         commonHelper.response(res, result.rows, 200, "Recipe deleted");
