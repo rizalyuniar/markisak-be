@@ -16,7 +16,11 @@ const commonHelper = require("../helper/common");
 // Import Helper for authentication
 const authHelper = require("../helper/auth");
 const { sendMail } = require("../config/mail");
-const { updatePhoto, uploadPhoto, deletePhoto } = require("../config/googleDrive.config");
+const {
+    updatePhoto,
+    uploadPhoto,
+    deletePhoto,
+} = require("../config/googleDrive.config");
 
 // Function to get all or search from databas
 const getAllUsers = async (req, res) => {
@@ -202,13 +206,16 @@ const updateUser = async (req, res) => {
                 } else {
                     const oldPhoto = result.rows[0].photo;
                     const oldPhotoId = oldPhoto.split("=")[1];
-                    const updateResult = await updatePhoto(req.file, oldPhotoId);
+                    const updateResult = await updatePhoto(
+                        req.file,
+                        oldPhotoId
+                    );
                     console.log(updateResult);
                     const parentPath = process.env.GOOGLE_DRIVE_PHOTO_PATH;
                     req.body.queryFilename = parentPath.concat(updateResult.id);
                 }
             } catch (err) {
-                console.log(err)
+                console.log(err);
                 req.body.queryFilename = result.rows[0].photo;
             }
             userModel
@@ -237,43 +244,30 @@ const updateUser = async (req, res) => {
 // Function to delete
 const deleteUser = async (req, res) => {
     const paramId = req.params.id;
-    //   userModel
-    //     .selectUser(paramId)
-    //     .then((result) => {
-    //       To delete picture
-    //         const filename = result.rows.product_filename;
-    //         if (typeof filename !== "undefined") {
-    //           fs.unlinkSync(__dirname + "/../uploads/" + filename);
-    //         }
-    //     })
-    //     .catch((err) => {
-    //       console.log(err);
-    //       res.send(err.detail);
-    //     });
-    userModel
-        .deleteUser(paramId)
-        .then((result) => {
-            // Display the result
-            if (result.rowCount > 0) {
-                return commonHelper.response(
-                    res,
-                    result.rows,
-                    200,
-                    "User deletion success"
-                );
-            } else {
-                return commonHelper.response(res, null, 404, "User not found");
-            }
-        })
-        .catch((err) => {
-            console.log(err);
+    try{    const getUser = await userModel.selectUser(paramId)
+        if (getUser.rowCount < 1){
+            return commonHelper.response(res, null, 404, "User not found");
+        }
+        const result = await userModel.deleteUser(paramId);
+        // Display the result
+        if (result.rowCount > 0) {
+            const oldPhoto = getUser.rows[0].photo;
+            const oldPhotoId = oldPhoto.split("=")[1];
+            const photoDelete = await deletePhoto(oldPhotoId)
             return commonHelper.response(
                 res,
-                null,
-                500,
-                "Failed to delete user"
-            );
-        });
+                result.rows,
+                200,
+                "User deletion success"
+            );} 
+            else {
+                return commonHelper.response(res, null, 404, "Deletion failed");
+            }}
+    catch(err){
+        console.log(err)
+        return commonHelper.response(res, null, 404, "Deletion failed");
+    }
+
 };
 
 const loginUser = async (req, res) => {
