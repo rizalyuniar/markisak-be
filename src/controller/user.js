@@ -244,30 +244,35 @@ const updateUser = async (req, res) => {
 // Function to delete
 const deleteUser = async (req, res) => {
     const paramId = req.params.id;
-    try{    const getUser = await userModel.selectUser(paramId)
-        if (getUser.rowCount < 1){
+    try {
+        const getUser = await userModel.selectUser(paramId);
+        if (getUser.rowCount < 1) {
             return commonHelper.response(res, null, 404, "User not found");
         }
         const result = await userModel.deleteUser(paramId);
         // Display the result
         if (result.rowCount > 0) {
+            if (
+                getUser.rows[0].photo === "photo.jpg" ||
+                getUser.rows[0].photo === "undefined"
+            ) {
+                return commonHelper.response(
+                    res,
+                    result.rows,
+                    200,
+                    "User deletion success"
+                );
+            }
             const oldPhoto = getUser.rows[0].photo;
             const oldPhotoId = oldPhoto.split("=")[1];
-            const photoDelete = await deletePhoto(oldPhotoId)
-            return commonHelper.response(
-                res,
-                result.rows,
-                200,
-                "User deletion success"
-            );} 
-            else {
-                return commonHelper.response(res, null, 404, "Deletion failed");
-            }}
-    catch(err){
-        console.log(err)
+            await deletePhoto(oldPhotoId);
+        } else {
+            return commonHelper.response(res, null, 404, "Deletion failed");
+        }
+    } catch (err) {
+        console.log(err);
         return commonHelper.response(res, null, 404, "Deletion failed");
     }
-
 };
 
 const loginUser = async (req, res) => {
