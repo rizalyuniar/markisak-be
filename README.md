@@ -9,7 +9,7 @@
     <br />
     <a href="https://markisak-fe.vercel.app">View Demo</a>
     ·
-    <a href="markisak-be-production-ddec.up.railway.app">Api Demo</a>
+    <a href="https://markisak-be-production-ddec.up.railway.app">Api Demo</a>
   </p>
 </p>
 
@@ -198,3 +198,5 @@ This backend API is created by 3 backend team members, where each member have di
     </tr>
   </table>
 </center>
+
+Project link : [https://github.com/ikkair/markisak-be](https://github.com/ikkair/markisak-be)
