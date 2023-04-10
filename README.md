@@ -1,13 +1,125 @@
-# Markisak-be
-Markisak-be is a RESTful API backend for interfacing markisak relational database and providing API for markisak frontend,
-markisak is a website where users can add and share recipes. 
+<br />
+<p align="center">
+  <div align="center">
+    <img height="150" src="./docs/readme/logo.png" alt="markisak" border="0"/>
+  </div>
+  <h3 align="center">Markisak (Recipe App)</h3>
+  <p align="center">
+    <a href="https://github.com/ikkair/markisak-be"><strong>Explore the docs »</strong></a>
+    <br />
+    <a href="https://markisak-fe.vercel.app">View Demo</a>
+    ·
+    <a href="https://markisak-be-production-ddec.up.railway.app">Api Demo</a>
+  </p>
+</p>
 
-This repository also serves as a learning exercise at team collaboration and management.
+## Table of Contents
 
-## Teams members
-This backend API is created by 3 team members, where each member have different tasks
+- [Table of Contents](#table-of-contents)
+- [About The Project](#about-the-project)
+  - [Built With](#built-with)
+- [Installation](#installation)
+  - [Documentation](#documentation)
+  - [Related Project](#related-project)
+- [Contributors](#contributors)
+  - [Meet The Team Members](#meet-the-team-members)
 
-[@breadsticks64 (Alif Anke Bima Putra)] : 
+# About The Project
+
+Markisak is a food recipe website project that aims to inspire users to cook and share their favorite recipes. The name Markisak means "let's cook" in Indonesian. On this website, users can search for recipes, share their own recipes, and connect with other food enthusiasts.
+
+One of Markisak's main features is its user-friendly search function. Users can search for recipes by food name. The website also provides detailed recipe instructions, ingredient lists, and video tutorials to assist users in the cooking process.
+
+Another unique feature of Markisak is that users can create their own profiles, connect with other users, and share their favorite recipes. This allows users to learn from each other and explore new culinary ideas.
+
+To use the Markisak website, users simply need to create an account and start searching or sharing recipes. The site is designed to be easy to use and accessible to all levels of culinary expertise
+
+## Built With
+
+These are the libraries and service used for building this backend API
+
+- [Node.js](https://nodejs.org)
+- [Express](https://expressjs.com)
+- [PostgreSQL](https://www.postgresql.org)
+- [Json Web Token](https://jwt.io)
+- [Multer](https://github.com/expressjs/multer)
+- [Google Cloud Platform](https://cloud.google.com)
+
+# Installation
+
+Follow this steps to run the server locally :
+
+1. Clone this repository
+
+```sh
+git clone https://github.com/ikkair/markisak-be
+```
+
+2. Change directory to markisak-be
+
+```sh
+cd markisak-be
+```
+
+3. Install all of the required modules
+
+```sh
+npm install
+```
+
+4. Create PostgreSQL database, query are provided in [markisak-database-query.sql](./docs/markisak-database-query.sql)
+
+5. Create and configure `.env` file in the root directory, example credentials are provided in [.env.example](./.env.example)
+
+```txt
+- Please note that this server requires Google Drive API credentials and Gmail service account
+- Otherwise API endpoint with image upload and account register won't work properly
+```
+
+6. Run this command to run the server
+
+```sh
+npm run server
+```
+
+- Or run this command for running in development environment
+
+```sh
+npm run dev
+```
+
+- Run this command for debugging and finding errors
+
+```sh
+npm run lint
+```
+
+## Documentation
+
+Documentation files are provided in the [docs](./docs) folder
+
+- [Postman API colletion](./docs/Markisak-be.postman_collection.json)
+- [PostgreSQL database query](./docs/markisak-database-query.sql)
+- [Database diagram](./docs/markisak-database-diagram.png)
+
+API endpoint list are also available as published postman documentation
+
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://documenter.getpostman.com/view/26309865/2s93XsYSGG)
+
+## Related Project
+
+:rocket: [`Backend Markisak`](https://github.com/ikkair/markisak-be)
+
+:rocket: [`Frontend Markisak`](https://github.com/ikkair/markisak-fe)
+
+:rocket: [`Demo Markisak`](https://markisak-fe.vercel.app/)
+
+# Contributors
+
+This backend API is created by 3 backend team members, where each member have different tasks
+
+[@alifankebima (Alif Anke Bima Putra)](https://github.com/alifankebima) :
+
 - Relational database design
 - Recipes CRUD
 - Videos CRUD
@@ -16,7 +128,8 @@ This backend API is created by 3 team members, where each member have different 
 - Comments CRUD
 - Postman API documentation
 
-[@ikkair (Ikhlasul Kamal Irmansyah)] : 
+[@ikkair (Ikhlasul Kamal Irmansyah)](https://github.com/ikkair) :
+
 - Team leader
 - Users CRUD
 - Authentication
@@ -25,69 +138,65 @@ This backend API is created by 3 team members, where each member have different 
 - Multer implementation
 - Backend deployment
 
-[@andkvnt (Andiko Oktavianto)] : 
+[@andkvnt (Andiko Oktavianto)](https://github.com/andkvnt) :
+
 - Project initialization
 - Admin CRUD
 - Chats CRUD
 - Testing
 - Recipe dummy data
 
-## Documentation
-Documentation files are provided in the [docs] folder
-- [Postman API colletion]
-- [PostgreSQL database query]
-- [Database diagram]
+## Meet The Team Members
 
-## Installation
-Follow this steps to run the server :
-1. Clone this repository with `git clone https://github.com/ikkair/markisak-be.git`
-2. Change directory to markisak-be with `cd markisak-be`
-3. Run `npm install` to install all of the required modules
-4. Create PostgreSQL database, query are provided in the [docs] folder
-5. Create and configure `.env` file in the root directory, example are provided in `.env.example`
-6. Run `npm run server` to run the server, or use `npm run dev` for running in development environment
+<center>
+  <table align="center">
+    <tr >
+      <th >Backend Developer / Project Manager</th>
+      <th >Backend Developer</th>
+      <th >Backend Developer</th>
+      <th >Frontend Developer</th>
+      <th >Frontend Developer</th>
+      <th >Frontend Developer</th>
+    </tr>
+    <tr >
+      <td align="center">
+        <a href="https://github.com/ikkair">
+          <img width="200"  src="./docs/readme/kamal.jpg" alt="Ikhlasul Kamal Irmansyah"><br/>
+          <b>Ikhlasul Kamal Irmansyah</b>
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/alifankebima">
+          <img width="200"  src="./docs/readme/alif.jpg" alt="Alif Anke Bima Putra"><br/>
+          <b>Alif Anke Bima Putra</b>
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/andkvnt">
+          <img width="200"  src="./docs/readme/andhiko.jpg" alt="Andiko Oktavianto"><br/>
+          <b>Andiko Oktavianto</b>
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/mhmdiamd">
+          <img width="200"   src="./docs/readme/ilham.jpg" alt="Muhamad Ilham Darmawan"><br/>
+          <b>Muhamad Ilham Darmawan</b>
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/Dhimasswara">
+          <img width="200"  src="./docs/readme/dhimas.jpg" alt="Dhimas Pandu Yogaswara"><br/>
+          <b>Dhimas Pandu Yogaswara</b>
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/rrizalyuniar">
+          <img width="200"  src="./docs/readme/rizal.jpg" alt="R. Rizal Yuniar S."><br/>
+          <b>R. Rizal Yuniar S.</b>
+        </a>
+      </td>
+    </tr>
+  </table>
+</center>
 
-## Debugging
-Run `npm run lint` for debugging errors in this repository
-
-## List of third-party modules
-| Modules | Description |
-| ------ | ------ |
-| [Express] | Backend framework |
-| [Nodemon] | Restart server on file change |
-| [Morgan] | HTTP request logger |
-| [node-postgres] | PostgresSQL interface library |
-| [Dotenv] | Load environment variables |
-| [CORS] | Enable CORS |
-| [ESLint] | Linter for debugging |
-| [Http-errors] | Create HTTP errors |
-| [Helmet] | Set HTTP headers for security |
-| [XSS-Clean] | Sanitize user input |
-| [Bcryptjs] | Password encryption and salting |
-| [Jsonwebtoken] | Token based user authentication |
-| [Multer] | multipart/form-data handling |
-| [Path] | Directory and file path handling |
-| [UUID] | UUID Generator |
-
-[docs]: <docs>
-[Postman API colletion]: <docs/Markisak-be.postman_collection.json>
-[PostgreSQL Database Query]: <docs/query.sql>
-[Database Diagram]: <docs/markisak-database-diagram.png>
-[@breadsticks64 (Alif Anke Bima Putra)]: <https://www.github.com/breadsticks64>
-[@ikkair (Ikhlasul Kamal Irmansyah)]: <https://www.github.com/ikkair>
-[@andkvnt (Andiko Oktavianto)]: <https://www.github.com/andkvnt>
-[express]: <https://expressjs.com>
-[Nodemon]: <https://nodemon.io/>
-[Morgan]: <https://github.com/expressjs/morgan#readme>
-[node-postgres]: <https://node-postgres.com>
-[Dotenv]: <https://www.npmjs.com/package/dotenv>
-[CORS]: <https://github.com/expressjs/cors#readme>
-[ESLint]: <https://eslint.org>
-[Http-errors]: <https://www.npmjs.com/package/http-errors>
-[Helmet]: <https://helmetjs.github.io/>
-[XSS-Clean]: <https://github.com/jsonmaur/xss-clean>
-[Bcryptjs]: <https://github.com/dcodeIO/bcrypt.js>
-[Jsonwebtoken]: <https://jwt.io/>
-[Multer]: <https://github.com/expressjs/multer>
-[Path]: <https://github.com/jinder/path>
-[UUID]: <https://github.com/uuidjs/uuid>
+Project link : [https://github.com/ikkair/markisak-be](https://github.com/ikkair/markisak-be)
